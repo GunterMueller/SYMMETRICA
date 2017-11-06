@@ -1,0 +1,21 @@
+
+NAME:
+	ndg
+SYNOPSIS:
+	INT ndg(OP part, OP perm, OP res)
+DESCRIPTION:
+	computes integral irreducible rep labeled by the 
+	PARTITION object part for the PERMUTATION
+	object perm. The result will be a MATRIX object.
+EXAMPLE:
+        #include "def.h"
+        #include "macro.h"
+
+        BEGIN
+        scan(scanobjectkind(),a);
+        scan(PERMUTATION,b);
+        ndg(a,b,c);
+        println(c);
+        END
+
+

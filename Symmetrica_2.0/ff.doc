@@ -1,0 +1,147 @@
+COMMENT:
+	file: ff.doc 
+
+	FINITE FIELD ELEMENTS
+
+	in this file the routines for the manipulation of finite
+	filed elements are documented. 
+	A FF (=FINITEFIELD) object is a VECTOR object whose
+	first entry contains the characteristic, the second
+	entry is not available for manipulation. So it not
+	possible to use VECTOR routines for the manipulation of
+	FF objects.
+	To acces the characteristic of a FF object you have
+	the functions
+
+NAME:	
+	s_ff_c
+SYNOPSIS: 
+	OP s_ff_c( OP ff)
+DESCRIPTION: 
+	gives the characteristic of a FF object
+	as an INTEGER object
+NAME:	
+	s_ff_ci
+SYNOPSIS: 
+	INT s_ff_ci( OP ff)
+DESCRIPTION: 
+	gives the characteristic of a FF object
+	as an INT value.
+
+COMMENT:
+	If you want to build a FF object by hand, you may look
+
+	If you want to build a FF object by hand, you may look
+	at the routine m_vector_ff below. The arithmetic
+	for finite field elements needs the files
+
+	trace_02.pol
+	trace_03.pol
+	trace_05.pol
+	trace_07.pol
+	trace_11.pol
+	trace_13.pol
+	....
+
+	in the actual directory. This is no longer true, you may
+	also work without these files, in this case they will
+	be built automatically. But if you have this files, the
+	arithmetic may be faster in cases, where we can use
+	precomputed values out of these files.
+
+	The arithmetic computes dynamically extensions of the 
+	current field. To get the INT-value of the
+	current extensiondegree of a FF object there is the routine
+
+NAME:	
+	s_ff_di
+SYNOPSIS: 
+	INT 	s_ff_di(OP ff)
+DESCRIPTION: 
+	gives the degree of the extension as an INT value
+
+COMMENT:
+	Routines for FF objects alphabetically sorted
+	---------------------------------------------
+
+NAME:	
+	first_ff
+SYNOPSIS: 
+	INT first_ff(OP char, OP degree, OP res)
+DESCRIPTION:
+	computes the lex. first element of given degree of extension
+	and given characteristic
+
+NAME:	
+	m_ff_vector
+SYNOPSIS: 
+	INT m_ff_vector(OP ff, OP vec)
+DESCRIPTION: 
+	you may interpret a element of a field extension
+	as a element of vectorspace of the prime field, so
+	you get a INTEGERVECTOR vec of length = degree of the
+	extension. 
+	This routine is the inverse routine to m_vector_ff
+
+NAME:	
+	m_vector_ff
+SYNOPSIS: 
+	INT m_vector_ff(OP char, OP vec, OP res)
+DESCRIPTION: 
+	builds a FF object res, whose characteristic is given
+	by the INTEGER object a. The second parameter vec is a VECTOR
+	object with INTEGER entries between 0 and char-1. These are
+	the coefficents of the FF object res according to the 
+	internally used, not documented, basis.
+
+NAME:	
+	next
+SYNOPSIS: 
+	INT next(OP a,b)
+DESCRIPTION: 
+	computes the lexicographic next element in the
+	finite filed. returns FALSE if we had already the last element.
+	returns TRUE else.
+
+NAME:	
+	order_ff
+SYNOPSIS: 
+	INT order_ff( OP ff, OP res)
+DESCRIPTION: 
+	the input is a object of type FF, the output
+	is a INTEGER object res, which contains the order 
+	of the input object. (order = number of multiplications
+	to get unity)
+
+NAME:	
+	random_ff
+SYNOPSIS: 
+	INT random_ff(OP res)
+DESCRIPTION: 
+	computes a random finite field element
+
+
+
+COMMENT:
+	standard routines
+	-----------------
+	add
+	add_apply
+	addinvers
+	comp
+	copy
+	einsp
+	fprint
+	fprintln
+	invers
+	mult
+	mult_apply
+	next
+	nullp
+	objectread 		MISSING
+	objectwrite		MISSING
+	print
+	println
+	scan
+	sub
+	tex			MISSING

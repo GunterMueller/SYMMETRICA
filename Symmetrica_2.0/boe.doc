@@ -1,0 +1,229 @@
+NAME:		
+	specht_poly
+SYNOPSIS:	
+	INT specht_poly(OP a,b)
+DESCRIPTION:	
+	you enter  a TABLEAUX object a, and the output is
+	the corresponding Specht polynomial b, a object of the type
+	POLYNOM. The mathematical background is described in
+	Specht: Math. Zeitschr. ??
+	You may enter also a skewtableaux.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	BEGIN
+	scan(TABLEAUX,a);
+	specht_poly(a,b);
+	println(b);
+	END
+
+NAME:		
+	specht_dg
+SYNOPSIS:	
+	INT  specht_dg(OP a,b,c) 
+DESCRIPTION:	
+	you enter a PARTITION or SKEWPARTITION object a, and a
+	PERMUTATION object  b, and the output is the corresponding
+	representation of the symmetric group. This representation is
+	integral and in the case of a PARTITION object a, it is  irreducible.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	BEGIN
+	scan(scanobjectkind(),a);
+	scan(PERMUTATION,b);
+	specht_dg(a,b,c);
+	println(c);
+	END
+
+NAME:       
+	an_odg
+SYNOPSIS:    
+	INT an_odg(OP part,perm,D)
+DESCRIPTION: 
+	computes the unitary matrix D representing a PERMUTATION perm
+   in the irreducible resresentation [part] of a partition part restricted
+   to An (part has to be a VECTOR of length 2, the compnents of which are
+   a partition and an integer 0L or 1L). 0L means, that [part]+ is
+   concerned in case of a selfconjugate partition, and 1L indicates
+   [part]-.
+
+NAME:       
+	an_rz_perm
+SYNOPSIS:    
+	INT an_rz_perm(OP per,res)
+DESCRIPTION: 
+	computes the decomposition of the PERMUTATION per into the
+   generating elements (1,2)(2,3), .... ,(1,2)(n-1,n) of An. The result is a VECTOR
+   of INTEGER, which is to read from right to left.
+
+NAME:       
+	an_sdg
+SYNOPSIS:    
+	INT an_sdg(OP part,perm,D)
+DESCRIPTION: 
+	computes the seminormal matrix D representing a PERMUTATION perm
+   in the irreducible resresentation [part] of a partition part restricted
+   to An (part has to be a VECTOR of length 2, the compnents of which are
+   a partition and an integer 0L or 1L). 0L means, that [part]+ is
+   concerned in case of a selfconjugate partition, and 1L indicates
+   [part]-.
+
+NAME:       
+	an_trafo_odg
+SYNOPSIS:    
+	INT an_trafo_odg(OP part,perm,D)
+DESCRIPTION: 
+	computes the unitary matrix D representing a PERMUTATION perm
+   in the irreducible resresentation [part] of a partition part restricted
+   to An (part has to be a VECTOR of length 2, the components of which are
+   a partition and an integer 0L or 1L). 0L means, that [part]+ is
+   concerned in case of a selfconjugate partition, and 1L indicates
+   [part]-. The result arises from the transformation of the according
+   matrix of [part] over Sn.
+
+NAME:       
+	an_trafo_sdg
+SYNOPSIS:    
+	INT an_trafo_sdg(OP part,perm,D)
+DESCRIPTION: 
+	computes the seminormal matrix D representing a PERMUTATION perm
+   in the irreducible resresentation [part] of a partition part restricted
+   to An (part has to be a VECTOR of length 2, the components of which are
+   a partition and an integer 0L or 1L). 0L means, that [part]+ is
+   concerned in case of a selfconjugate partition, and 1L indicates
+   [part]-. The result arises from the transformation of the according
+   matrix of [part] over Sn.
+
+NAME:
+       alt_sdg_trafo
+SYNOPSIS:
+    INT alt_sdg_trafo(OP part,D)
+DESCRIPTION:
+ transforms the seminormal MATRIX D, belonging to the irreducible
+   representation [part] of a selfconjugate PARTITION part of Sn into a
+   matrix containing only two blocks in the main diagonal, the blocks of
+   the seminormal matrices belonging to [part]+ and [part]-.
+
+NAME:
+       alt_odg_trafo
+SYNOPSIS:
+    INT alt_odg_trafo(OP part,D)
+DESCRIPTION:
+ transforms the orthogonal MATRIX D, belonging to the irreducible
+   representation [part] of a selfconjugate PARTITION part of Sn into a
+   matrix containing only two blocks in the main diagonal, the blocks of
+   the orthogonal matrices belonging to [part]+ and [part]-.
+
+NAME:
+       gen_mat
+SYNOPSIS:
+    INT gen_mat(OP part;INT index,ref;OP res)
+DESCRIPTION:
+ computes the unitary matrix representing the permutation 
+   (12)(index+1,index+2) within the irreducible representation [part]+
+   oder [part]- of the selfconjugated PARTITION part, where the number ref
+   handles, which part of the representing martix, transformed by
+   alt_odg_trafo(), has to be given back as result. ref=0L indicates the
+   first block, and ref=1L the second.
+
+NAME:
+       gen_smat
+SYNOPSIS:
+    INT gen_smat(OP part;INT index,ref;OP res)
+DESCRIPTION:
+ computes the seminormal matrix representing the permutation 
+   (12)(index+1,index+2) within the irreducible representation [part]+
+   oder [part]- of the selfconjugated PARTITION part, where the number ref
+   handles, which part of the representing martix, transformed by
+   alt_odg_trafo(), has to be given back as result. ref=0L indicates the
+   first block, and ref=1L the second.
+
+NAME:
+       get_ax_dist
+SYNOPSIS:
+    INT get_ax_dist(OP tab;INT r,s;OP res)
+DESCRIPTION:
+ computes the axial distance between the INTEGERs r and s in a 
+   standard-young-TABLEAU tab.
+
+NAME:
+       get_position
+SYNOPSIS:
+    INT get_position(OP tab;INT r;OP res)
+DESCRIPTION:
+ computes the position of the INTEGER r in a TABLEAU tab. The first
+      appearence of r is taken. The result is a VECTOR of length 2 of
+      INTEGER.
+
+NAME:
+       make_all_st_tabs
+SYNOPSIS:
+    INT make_all_st_tabs(OP par,res)
+DESCRIPTION:
+ computes all standard-young-tableaux belonging to a PARTITION 
+      par ordered in last letter sequence. The result is a VECTOR.
+BUG:
+       The matrices in which the tableaux are stated can be bigger than
+          necessary!
+
+NAME:
+       make_tab_signs
+SYNOPSIS:
+    INT make_tab_signs(OP par,res)
+DESCRIPTION:
+ computes a vector of integers, that contain the signs of the 
+      permutations transforming the first standard-young-tableau of a
+      PARTITION par into the ith, where the tableaux are ordered according
+      the last letter sequence.
+
+NAME:
+       mat_comp
+SYNOPSIS:
+    INT mat_comp(OP a,b)
+DESCRIPTION:
+ compares two MATRICES a and b allowing the entries to be of type
+      SQ_RADICAL.
+RETURN:
+       0L in case a equal b, else 1L.
+
+NAME:
+       op_transpo_tab
+SYNOPSIS:
+    INT op_transpo_tab(INT transpo;OP tab,res)
+DESCRIPTION:
+ computes the TABLEAU (transpo,transpo+1)*tab, where tab is a 
+      TABLEAU, too.
+
+NAME:
+       tab_funk
+SYNOPSIS:
+    INT tab_funk(OP n,part,tab,res)
+DESCRIPTION:
+ computes the value of the tableau function of a TABLEAU tab
+      belonging to a PARTITION part of a INTEGER n. tab has to be a
+      standard-young-tableau.
+
+NAME:
+       tab_index
+SYNOPSIS:
+    INT tab_index(OP tab,vector)
+DESCRIPTION:
+ computes the index of a TABLEAU tab in a VECTOR of tableaux
+      vector.
+RETURN:
+       index, in case that tab is in vector, else -1.
+
+NAME:
+       trafo_check
+SYNOPSIS:
+    INT trafo_check(OP part)
+DESCRIPTION:
+ checks in case of a selfconjugate PARTITION part, where the 
+      representing matrices of the representation [part]+ and [part]-
+      will occur, if the representing martix of [part] is reduced with the
+      transforming matrices given by B.M. Puttaswamaiah (1963), as
+      implemented in alt_odg_trafo.
+RETURN:
+     0L in case that [part]+ is in the first block, else 1L.

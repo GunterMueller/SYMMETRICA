@@ -1,0 +1,1230 @@
+COMMENT:
+I am enclosing two document files relating to nb.c.
+They are separated by rows of ####'s.
+
+The first deals with routines in nb.c which are global, and the
+second with those that are static.
+
+They are incomplete in three ways, perhaps.
+(i)    I have not yet included enough examples.
+(ii)   Some of the remarks about return values may not be correct.
+	   I have not checked them very carefully.
+(iii)  You may consider that, in some respects, there is too much
+	   in them and, in particular, that the statics should not be
+	   included.
+
+
+############################################################
+NB.DOC
+######
+
+ELEMENTS IN NUMBER FIELDS
+-------------------------
+
+This module contains routines for manipulating elements in number fields.
+For the current implementation, two type of number field are available:
+(i):    Cyclotomic fields,
+(ii):   Square radical fields -- i.e. extensions of the rational number field
+by finitely many square roots of rational integers.
+
+The objects in SYMMETRICA which implement these numbers are known as 
+cyclos and
+sqrads and have the SYMMETRICA types CYCLOTOMIC and SQ_RADICAL, respectively.
+They are based on an object known as a monopoly and of type MONOPOLY which
+implements a polynomial in one variable.
+
+In what follows, a monopoly in the variable x may be denoted by p(x) or
+a_n * x:n + a_(n-1) * x:(n-1) + . . . + a_1 * x + a_0.
+
+When this represents a cyclo, x will be the 'basic' primitive m-th root of
+unity e:(2 * pi * i / m) for an appropriate positive integer m -- m will be
+known as the index of the cyclo.
+
+When the monopoly above represents a sqrad, the sqrad corresponds to the
+number a_n * \sqrt(n) + a_(n-1) * \sqrt(n-1) + . . . + a_1.
+
+The following gives further details of the three structures MONOPOLY,
+CYCLOTOMIC, SQ_RADICAL
+
+A monopoly is an object of type MONOPOLY, with two fields -- a self and a
+next.  Thus, it is syntactically the same as a list.  Its next is a
+monopoly or NULL.  Its self is a monom whose coefficient is a scalar (integer
+or rational number) and whose self is a non-negative integer.  Note that no
+check is made to see whether these constraints are satisfied, but certain
+routines will behave strangely if they are violated.
+
+There is a number object with two fields -- self and data. The self is a
+monopoly.  A cyclo is an number object of type CYCLOTOMIC whose data field
+is a pointer to a block of four items -- the index, the corresponding
+cyclotomic polynomial, its degree and the 'automorphisms' of the field
+(in fact, the integers between 1 and the index and coprime to it).
+A sqrad is a number object whose data is a list of the prime divisors
+(including -1) of the integers occuring as selfs of the terms of its monopoly.
+
+Data relating to cyclotomic numbers are held in a table (read from a file
+named CYCLOS.DAT) and in a list.  A newly created cyclo with a known index
+(i.e. known to the table or the list) has a data pointer pointing to the
+known table or list item.  A newly created cyclo with a new index has a
+new data item created and appended to the list.  At any time, the list of
+data items may be appended to CYCLOS.DAT.
+
+Although descriptions of the basic routines for manipulating the various
+types of number, one should normally use the general routines given at the
+end of this document. For example, use add(x,y) rather than
+add_scalar_cyclo(x,y), since the general routines have type-checking built
+in.
+
+ELEMENTARY ROUTINES RELATING TO INTEGERS.
+-----------------------------------------
+
+NAME:             
+	number_of_digits
+SYNOPSIS:         
+	INT number_of_digits(OP a)
+DESCRIPTION:      
+	Determines the number of digits of the integer a.  a may be
+    an INTEGER  or a LONGINT.
+RETURN:           
+	The number of digits.
+
+NAME:             
+	integer_factors_to_integer
+SYNOPSIS:         
+	INT integer_factors_to_integer(OP l,OP a)
+DESCRIPTION:      
+	l is a MONOPOLY representing the factorization of an integer
+    into integers with integer exponents.  These factors are combined to reform
+    the integer.
+RETURN:           
+	OK or ERROR
+
+
+NAME:  
+	   make_coprimes
+SYNOPSIS: 
+	INT make_coprimes(OP number,OP result)
+DESCRIPTION:
+	      Given the number n, which should be a positive INTEGER or
+    LONGINT or a MONOPOLY representing a factorisation of an integer greater
+    than 1, the result returns the list of positive integers coprime to n.
+RETURN:
+	           OK or ERROR
+
+
+NAME:      
+       euler_phi
+SYNOPSIS:
+         INT euler_phi(OP a,OP b)
+DESCRIPTION:
+     Determines the number of numbers coprime to an integer a
+    and returns it in b. The object a may be INTEGER object or LONGINT object.
+RETURN:
+           OK or ERROR !!
+
+
+
+NAME:             
+	ganzsquareroot_longint
+SYNOPSIS:         
+	INT ganzsquareroot_longint(OP a,OP b)
+DESCRIPTION:      
+	a is a non-negative LONGINT object.
+    b is set to the integer part of its square root.  In this case, the return
+    value is OK or IMPROPER according as the integer is a perfect square or not.
+    Otherwise, the return value is ERROR.
+RETURN:           
+	OK, IMPROPER or ERROR
+
+
+NAME:             
+                  ganzsquareroot_integer
+SYNOPSIS:         
+	INT ganzsquareroot_integer(OP a,OP b)
+DESCRIPTION:      
+	 a is a non-negative INTEGER object.
+    b is set to the integer part of its square root.  In this case, the return
+    value is OK or IMPROPER according as the integer is a perfect square or not.
+    Otherwise, the return value is ERROR.
+RETURN:           
+	OK, IMPROPER or ERROR
+
+NAME:		
+	primep
+SYNOPSIS:	
+	INT primep(OP a)
+DESCRIPTION:	
+	returns TRUE if a is prime number FALSE else
+
+COMMENT:
+INTEGER FACTORISATION
+---------------------
+
+There is a simple routine for prime factorization of integers. A table of
+prime factors is either read from a file PRIMES.DAT or constructed directly.
+An integer is factored by first using the primes in the table, and then
+continuing through all odd numbers following the greatest prime in the table.
+
+NAME:             
+	setup_prime_table
+SYNOPSIS:        
+	 INT setup_prime_table()
+DESCRIPTION:   
+	   Creates a table of rational prime numbers.
+    If the source is compiled with PRIME_FILE #defined, it searches for a file
+    in the current directory named PRIMES.DAT, and reads the table of primes
+    from that file. The first entry should be the number of primes in the file,
+    then the list of primes (assumes that INTs are longs).
+    If PRIME_FILE is not #defined, a table of the first 15 primes is set up.
+    Returns OK if the table is set; otherwise, returns ERROR.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           first_prime_factor
+SYNOPSIS:
+	 INT first_prime_factor(OP a,OP first_prime)
+DESCRIPTION:
+      This routine finds the smallest prime factor of an integer
+    a. The prime found is returned as first_prime.
+RETURN:
+           OK or ERROR
+
+
+NAME:  
+	   square_free_part
+SYNOPSIS:
+	 INT square_free_part(OP a,OP b,OP c,OP la,OP lb,OP lc)
+DESCRIPTION:
+	      This routine find the square-free part of the integer a,
+    i.e. the product of the prime factors which occur to an odd exponent and -1,
+    if the integer is negative.  a may be either an INTEGER, LONGINT or a
+    MONOPOLY containing the prime factorization of an integer.
+    b and c return the the square-free part the square-root of the square part,
+    respectively. Thus, a = b * c ** 2, and b has no repeated prime factors.
+    If a is not a MONOPOLY and la is not NULL, la returns a MONOPOLY containing
+    the prime factorization of a.  If they are not NULL, lb and lc return
+    MONOPOLYs containing the prime factorizations of b and c.
+    The parameters a,b,c must be distinct.  If la,lb,lc are not NULL they must
+    be distinct also.
+    This routine makes use of the ancillary routine square_free_part_0.
+RETURN:
+	           OK or ERROR
+
+NAME:      
+       square_free_part_0
+SYNOPSIS:
+     INT square_free_part_0( OP la,lb,lc)
+DESCRIPTION:
+      This routine find the square-free part of the integer, which
+    is given as a prime factors list la -- a MONOPOLY containing the prime
+    factorization of the integer.  lb and lc return MONOPOLYs containing the
+    prime factorization of the square-free part and square-root of the square
+    part, respectively.
+    That is, lb has no prime (including -1), occurring with an exponent > 1.
+    The parameters la,lb,lc must be distinct.
+RETURN:           
+	OK or ERROR
+
+NAME:   
+          jacobi
+SYNOPSIS:
+         INT jacobi(a,b,c) OP a,b,c;
+DESCRIPTION:
+      The Jacobi Symbol: (a/b) b odd.  a and b are integers.  c must
+    point to a location different from a and b. If a and b have a common factor,
+    c is set to 0 and ERROR is returned.  Otherwise, c is set to the the jacobi
+    symbol (a/b). Note that b must be odd.
+RETURN:  
+         OK or ERROR
+
+NAME:
+             kronecker
+SYNOPSIS:
+         INT kronecker(a,b,c) OP a,b,c;
+DESCRIPTION: 
+     The Kronecker Symbol: (a/b). a square-free and congruent to
+    0 or 1 mod 4.  a and b are integers.  c must point to a location different
+    from a and b.  If a and b have a common factor, c is set to 0 and ERROR is
+    returned.  Otherwise, c is set to the the kronecker symbol (a/b). Note
+    that b must be odd.
+RETURN:
+           OK or ERROR
+
+
+NAME:             
+	b_skn_mp
+SYNOPSIS:  
+	 INT b_skn_mp( OP s,k,n,e)
+DESCRIPTION: 
+	     Build a monopoly whose self is s, coefficient is
+    k and next is n.  b_skn_mp uses the objects supplied as arguments, while
+    m_skn_mp uses copies of them.
+RETURN:
+	           OK or ERROR (!)
+
+
+NAME:             
+	m_skn_mp
+SYNOPSIS:  
+	 INT m_skn_mp( OP s,k,n,e)
+DESCRIPTION: 
+	     Make a monopoly whose self is s, coefficient is
+    k and next is n.  b_skn_mp uses the objects supplied as arguments, while
+    m_skn_mp uses copies of them.
+RETURN:
+	           OK or ERROR (!)
+
+EXAMPLE:
+  Making the monopoly corresponding to -1 * x : 10 + 4 * x : 17.
+It is assumed that all OP identifiers point to objects created by callocobject.
+
+(1)
+    m_i_i(17L,b);
+    m_i_i(4L,c);
+    b_skn_mp(b,c,d,a);
+    b = callocobject();     /* need new objects for these pointers  */
+    c = callocobject();
+    m_i_i(10L,b);
+    m_i_i(-1L,c);
+    b_skn_mp(b,c,NULL,d);   /* at this stage the monopoly is complete   */
+
+The statement 'println(a);' causes the output 4 17  -1 10
+
+The statement 'objectwrite(stdout,a);' causes the output where, for convenience,
+some lines have been joined and the components have been annotated:
+126         1       21      1       4       1       17      1
+MONOPOLY    nonNULL MONOM   INTEGER value   INTEGER value   more terms
+126         1       21      1       -1      1       10      0
+MONOPOLY    nonNULL MONOM   INTEGER value   INTEGER value   no more terms
+
+(2)  The following creates the same monopoly, the insert routine carries
+out some sorting.
+
+    init(MONOPOLY,a);
+    m_i_i(10L,b);
+    m_i_i(-1L,c);
+    h = callocobject();
+    m_sk_mo(b,c,h);
+    insert(h,a,add_koeff,NULL);
+    m_i_i(17L,b);
+    m_i_i(4L,c);
+    h = callocobject();
+    m_sk_mo(b,c,h);
+    insert(h,a,add_koeff,NULL);
+
+The statement 'println(a);' causes the output -1 10  4 17
+
+The statement 'objectwrite(stdout,a);' causes the output:ce,
+126 1 21  1 -1 1 10 1 126 1 21  1 4 1 17 0
+
+NAME:             
+	scan_monopoly
+SYNOPSIS:        
+	 INT scan_monopoly(a) OP a;
+DESCRIPTION:   
+	   Routines for inputting a monopoly from stdin. scan_monopoly
+    requests the type of self and coefficient.  It then transfers control to
+    SCMPCO which requests the number of terms in the monopoly and inputs the
+    terms one by one. This is a subroutine of scan. It is better to
+	use the general routine scan.
+RETURN:
+	           OK or ERROR
+
+NAME:             
+	remove_zero_terms
+SYNOPSIS: 
+	        INT remove_zero_terms(a) OP a;
+DESCRIPTION:
+	      Removes those terms from a MONOPOLY with zero coefficients
+    unless this makes the list empty.  In this case, one term with self and
+    coefficient both 0 is left.
+RETURN:
+	           OK or ERROR
+
+
+NAME:
+	add_scalar_monopoly
+SYNOPSIS:
+		INT add_scalar_monopoly( OP a,b,c)
+DESCRIPTION:
+	subroutine of add
+
+
+NAME:
+	mult_scalar_monopoly
+SYNOPSIS:
+		INT mult_scalar_monopoly( OP a,b,c)
+DESCRIPTION:
+        subroutine of  mult
+
+NAME:
+	add_monopoly_monopoly
+SYNOPSIS:	
+	INT add_monopoly_monopoly( OP a, b, c)
+DESCRIPTION:
+        subroutine of add
+
+
+NAME:
+	 mult_monopoly_monopoly
+SYNOPSIS:	
+	INT mult_monopoly_monopoly(OP a, b, c)
+DESCRIPTION:
+        subroutine of  mult
+
+
+
+NAME:
+	add_monopoly
+SYNOPSIS:
+		INT add_monopoly( OP a,b,c)
+DESCRIPTION:
+        subroutine of add
+
+
+
+NAME:
+	add_apply_monopol
+SYNOPSIS:	
+	INT add_apply_monopoly( OP a,b)
+DESCRIPTION: 	
+	Addition of objects of type INTEGER, 
+	LONGINT, BRUCH and MONOPOLY. Subroutine of add_apply
+
+
+NAME:
+	mult_monopoly
+SYNOPSIS:	INT mult_monopoly( OP a,b,c)
+DESCRIPTION:	
+	for the multiplication of a object a of type MONOPOLY
+	with an arbitray object b, the result is the object c.
+	Subroutine of mult
+RETURN:		
+	OK if no error occured.
+	
+NAME:
+	 mult_apply_monopoly
+SYNOPSIS:	
+	INT mult_apply_monopoly(OP a,b)
+DESCRIPTION:	
+	Multiplication of objects of type INTEGER, LONGINT, 
+	BRUCH, MATRIX, MONOM, POLYNOM, SCHUBERT, VECTOR and MONOPOLY,
+	Better to use the general routine mult_apply
+
+NAME:
+	 addinvers_monopoly
+SYNOPSIS:	
+	INT addinvers_monopoly( OP a,b)
+DESCRIPTION:
+	subroutine of the general routine addinvers
+
+NAME:
+	addinvers_apply_monopoly
+SYNOPSIS:	
+	INT addinvers_apply_monopoly(OP a) 
+DESCRITPION:
+	subroutine of the general routine addinvers_apply
+
+NAME:
+	nullp
+SYNOPSIS:	
+	INT nullp_monopoly(OP a)
+DESCRIPTION:
+	subroutine of the general routine nullp.
+
+NAME:             
+	comp_monopoly
+SYNOPSIS:         
+	INT comp_monopoly(OP a,b)
+DESCRIPTION:      
+	Compares monopolies as lists, using comp_list()
+RETURN:       
+	0 (= equal) <0 if a<b >0 if a>b
+
+NAME:             
+	quores_monopoly
+SYNOPSIS:     
+    INT quores_monopoly( OP poly,dpoly,qpoly,rpoly)
+DESCRIPTION:      
+	Carries out the division algorithm on polynomials of one
+    variable to find the quotient (qpoly) and remainder (rpoly).  The result
+    is poly = dpoly * qpoly + rpoly, where rpoly has degree less than dpoly,
+    or represents 0.  The parameters poly, dpoly, qpoly and rpoly must all be
+    different.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+           raise_power_monopoly
+SYNOPSIS:
+         INT raise_power_monopoly( OP a, b)
+DESCRIPTION: 
+     Multiplies all the self components of the terms of the
+    monopoly b by the scalar a.  Viewing the monopoly as a polynomial p(x),
+    this has the effect of replacing it by p(x**a).
+RETURN:
+           OK or ERROR
+
+NAME:             
+	scale_monopoly
+SYNOPSIS:  
+	       INT scale_monopoly(a,b) OP a, b;
+DESCRIPTION:
+	      Viewing the monopoly b as a polynomial p(x), the effect of
+    this routine is to replace it by p(a*x).
+RETURN: 
+	          OK or ERROR
+
+NAME:  
+	           objectread_monopoly
+SYNOPSIS:
+	         INT objectread_monopoly(f,a) FILE *f; OP a;
+DESCRIPTION:
+	      Reads a monopoly a from the stream f.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           tex_monopoly
+SYNOPSIS:
+	         INT tex_monopoly(a) OP a;
+DESCRIPTION:
+	      Outputs a monopoly in a form suitable for TeX processing.
+    It is treated as a polynomial in x. Subroutine of the general routine
+	tex.
+RETURN:
+	           OK or ERROR
+
+
+NAME:  
+	           make_unitary0_monopoly
+SYNOPSIS:
+	         INT make_unitary0_monopoly(number,result) OP number, result;
+DESCRIPTION:
+	      Given the number n, which should be an positive INTEGER or
+    LONGINT, the result returns the monopoly corresponding to x**n-1.
+RETURN: 
+	          OK or ERROR
+
+NAME:  
+	           make_unitary1_monopoly
+SYNOPSIS:
+	         INT make_unitary1_monopoly(number,result) OP number, result;
+DESCRIPTION:
+	      Given the number n, which should be an positive INTEGER or
+    LONGINT, the result returns the MONOPOLY x**(n-1) + x**(n-2) + ... + x + 1.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           make_cyclotomic_monopoly
+SYNOPSIS:
+	         INT make_cyclotomic_monopoly(number,result) OP number, result;
+DESCRIPTION: 
+	     Given the number n, which should be an positive INTEGER or
+    LONGINT or a MONOPOLY representing a factorisation of an integer greater
+    than 1, the result returns the cyclotomic polynomial of index n, phi_n(x).
+RETURN:
+	           OK or ERROR
+
+
+NAME:
+			t_MONOPOLY_POLYNOM
+SYNOPSIS:	
+	INT t_MONOPOLY_POLYNOM(OP a,b) 
+DESCRIPTION:	
+	converts a MONOPOLY object  a into a POLYNOM object b
+	with one variable.
+
+
+NAME: 
+	            eq_fieldobject_int
+SYNOPSIS:
+	         INT eq_fieldobject_int(type,a,i) OBJECTKIND type; OP a; INT i;
+DESCRIPTION:
+	      Determines if the 'field object' (a monopoly, sqrad or cyclo)
+    is equal to the integer i.  Returns OK for equality. There are six
+    associated macros:
+    EINSP_MONOPOLY(a)           eq_fieldobject_int(MONOPOLY,(a),1L)
+    EINSP_CYCLO(a)              eq_fieldobject_int(CYCLOTOMIC,(a),1L)
+    EINSP_SQRAD(a)              eq_fieldobject_int(SQ_RADICAL,(a),1L)
+    NEGEINSP_MONOPOLY(a)        eq_fieldobject_int(MONOPOLY,(a),-1L)
+    NEGEINSP_CYCLO(a)           eq_fieldobject_int(CYCLOTOMIC,(a),-1L)
+    NEGEINSP_SQRAD(a)           eq_fieldobject_int(SQ_RADICAL,(a),-1L)
+RETURN:     
+	      OK or ERROR
+
+NAME:  
+                  b_ksd_n
+SYNOPSIS: 
+                  INT b_ksd_n(kind,self,data,result) OBJECTKIND kind;
+                        OP self,data,result;
+DESCRIPTION:
+	       build a number object (sqrad or cyclo), whose type
+    is 'kind', and with the given self and data.  b_ksd_n uses the objects
+    supplied as arguments, while m_ksd_n uses copies of them.
+RETURN:
+	           OK or ERROR (!)
+
+NAME:  
+	           m_ksd_n
+SYNOPSIS: 
+	        INT m_ksd_n(kind,self,data,result) OBJECTKIND kind;
+                        OP self,data,result;
+DESCRIPTION:
+	      Make a number object (sqrad or cyclo), whose type
+    is 'kind', and with the given self and data.  b_ksd_n uses the objects
+    supplied as arguments, while m_ksd_n uses copies of them.
+RETURN:
+	           OK or ERROR (!)
+
+NAME:             
+	objectwrite_number
+SYNOPSIS:
+	  INT objectwrite_number(f,number) FILE *f; OP number;
+DESCRIPTION:   
+	   writes a number (sqrad or cyclo)
+    to a stream.  In the case of a cyclo, the only part of the data
+    transferred is the index.  
+RETURN:
+           OK or ERROR
+
+NAME:             
+	objectread_number
+SYNOPSIS: 
+       INT objectread_number( FILE *f; OP number; OBJECTKIND type)
+DESCRIPTION:   
+	   Reads a number (sqrad or cyclo) from 
+     a stream.  In the case of a cyclo, the only part of the data
+    transferred is the index.  There are two associated macros:
+    OBJECTREAD_CYCLO(f,a)       objectread_number((f),(a),CYCLOTOMIC)
+    OBJECTREAD_SQRAD(f,a)       objectread_number((f),(a),SQ_RADICAL)
+RETURN:
+           OK or ERROR
+
+NAME:            
+	 fprint_number
+SYNOPSIS: 
+	        INT fprint_number(f,n) FILE *f; OP n;
+DESCRIPTION:
+	      Prints the number n on the stream f.  The self is printed
+    first and is separated by a colon from the data list in the case of a sqrad
+    and the index in the case of a cyclo.
+RETURN: 
+	          OK or ERROR
+
+COMMENT:
+There are the standard routines and macros
+
+NAME         MACRO              DESCRIPTION                      RETURN TYPE
+---------------------------------------------------------------------------
+c_n_s        C_N_S              change number self               INT
+c_n_d        C_N_D              change number data               INT
+s_n_s        S_N_S              select number self               OP
+s_n_d        S_N_D              select number sqrad data         OP
+s_n_dci      S_DCI_I            select number cyclo data:index   OP
+s_n_dcd      S_DCI_D            select number cyclo data:degree  OP
+s_n_dcp      S_DCI_P            select number cyclo data:poly    OP
+
+NAME:  
+	           mult_lists
+SYNOPSIS: 
+	        INT mult_lists(a,b,c) OP a, b, c;
+DESCRIPTION:
+	      Multiplies the entries in two lists pairwise, putting the
+    resulting objects in a list.  Duplicate objects are ignored.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           tidy
+SYNOPSIS:
+	         INT tidy(a) OP a;
+DESCRIPTION:
+	      Tidies up an object which contains cyclos in some of its
+    components.  Such cyclos are reduced modulo the cyclotomic polynomial.
+RETURN:
+	           OK or ERROR
+
+
+NAME: 
+            make_monopoly_sqrad
+SYNOPSIS:
+         INT make_monopoly_sqrad(a,b) OP a,b;
+DESCRIPTION:
+      Makes b a sqrad whose self is a copy of the monopoly a.
+    Also determines the data of the sqrad.
+RETURN: 
+          OK or ERROR
+
+NAME:
+             make_scalar_sqrad
+SYNOPSIS:
+         INT make_scalar_sqrad(a,b) OP a,b;
+DESCRIPTION:
+      Makes b a sqrad whose self is 1 and whose coefficient is a.
+RETURN:
+           OK or ERROR
+
+NAME:  
+           scan_sqrad
+SYNOPSIS: 
+        INT scan_sqrad(a) OP a;
+DESCRIPTION:
+      Input a sqrad directly from standard input.
+RETURN:
+           OK or ERROR
+
+
+NAME:
+	 add_scalar_sqrad
+SYNOPSIS:
+	INT add_scalar_sqrad(a,b,c) OP a,b,c;
+DESCRIPTION:
+	this is a subroutine  of the general routine add
+
+NAME:
+	 mult_scalar_sqrad
+SYNOPSIS:
+	INT mult_scalar_sqrad(a,b,c) OP a, b, c;
+DESCRIPTION:
+        this is a subroutine  of the general routine mult
+
+NAME:
+	add_sqrad_sqrad
+SYNOPSIS:
+	INT add_sqrad_sqrad(a,b,c) OP a, b, c;
+DESCRIPTION:
+        this is a subroutine  of the general routine add
+
+NAME:
+	mult_sqrad_sqrad
+SYNOPSIS:
+	INT mult_sqrad_sqrad(a,b,c) OP a, b, c;
+DESCRIPTION:
+        this is a subroutine  of the general routine mult
+
+NAME:
+	add_sqrad
+SYNOPSIS:
+	INT add_sqrad(a,b,c) OP a,b,c;
+DESCRIPTION:
+        this is a subroutine  of the general routine add
+
+NAME:
+	add_apply_sqrad
+SYNOPSIS:
+	INT add_apply_sqrad(a,b) OP a,b;
+DESCRIPTION:
+    Addition of objects of type INTEGER, LONGINT, BRUCH, POLYNOM,
+    SQ_RADICA or CYCLOTOMIC.
+	This is a subroutine  of the general routine add_apply
+
+NAME:
+	mult_sqrad
+SYNOPSIS:
+	INT mult_sqrad(a,b,c) OP a,b,c;
+DESCRIPTION:
+        this is a subroutine  of the general routine mult
+
+NAME:
+	mult_apply_sqrad
+SYNOPSIS:
+	INT mult_apply_sqrad(a,b) OP a,b;
+DESCRIPTION:
+    Multiplication of objects the first of type SQ_RADICAL and the second of
+    type INTEGER, LONGINT, CYCLOTOMIC, BRUCH, MATRIX, MONOM, VECTOR,
+    SQ_RADICAL, POLYNOM or SCHUBERT.
+	this is a subroutine  of the general routine mult_apply
+
+NAME:
+	addinvers_sqrad
+SYNOPSIS:
+	INT addinvers_sqrad(a,b) OP a,b;
+DESCRIPTION:
+        this is a subroutine  of the general routine addinvers
+
+NAME:
+	addinvers_apply_sqrad
+SYNOPSIS:
+	INT addinvers_apply_sqrad(a) OP a;
+DESCRIPTION:
+        this is a subroutine  of the general routine addinvers_apply
+
+NAME:
+	invers_sqrad
+SYNOPSIS:
+	INT invers_sqrad(a,b) OP a,b;
+DESCRIPTION:
+	this is a subroutine  of the general routine invers
+
+NAME:
+	nullp_sqrad
+SYNOPSIS:
+	INT nullp_sqrad(a) OP a;
+DESCRIPTION:
+	this is a subroutine  of the general routine nullp
+
+SYNOPSIS:
+	INT comp_sqrad(a,b) OP a,b;
+DESCRIPTION:     
+	Uses comp_list on the self fields.
+
+NAME:   
+	          tex_sqrad
+SYNOPSIS: 
+	        INT tex_sqrad(a) OP a;
+DESCRIPTION:
+	      Outputs a sqrad in a form suitable for TeX processing.
+    Each term of the self is expressed in the form: coefficient * \sqrt (self).
+RETURN:   
+	        OK or ERROR
+
+NAME:  
+	           squareroot_integer
+SYNOPSIS:
+	         INT squareroot_integer(a,b) OP a,b;
+DESCRIPTION:
+	      b is a sqrad whose square is the scalar a, which is a
+	INTEGER object. This is a
+	subroutine of the generalroutine squareroot
+RETURN: 
+	          OK or ERROR
+
+
+NAME:  
+                  squareroot_longint
+SYNOPSIS:
+                  INT squareroot_longint(a,b) OP a,b;
+DESCRIPTION:
+	      b is a sqrad whose square is the scalar a, which is a
+	LONGINT object. This is a
+	subroutine of the generalroutine squareroot
+RETURN: 
+	          OK or ERROR
+
+NAME:  
+                  squareroot_bruch
+SYNOPSIS:
+                  INT squareroot_bruch(a,b) OP a,b;
+DESCRIPTION:
+	      b is a sqrad whose square is the scalar a, which is a
+	BRUCH object. This is a
+	subroutine of the generalroutine squareroot
+RETURN: 
+	          OK or ERROR
+
+
+
+NAME:  
+	           convert_radical_cyclo
+SYNOPSIS:
+	         INT convert_radical_cyclo(a,b) OP a,b;
+DESCRIPTION:
+	      Converts the square root of an integer a to a cyclo b.
+RETURN:
+	           OK
+
+
+NAME:
+	             trans_index_monopoly_cyclo
+SYNOPSIS: 
+	        INT trans_index_monopoly_cyclo(a,b,c) OP a,b,c;
+DESCRIPTION: 
+	     Given a positive integer a and a monopoly b corresponding to
+    the polynomial p(x), a cyclo c is constructed whose index is a and which
+    repersents the cyclotomic number p(x) where x is the basic primitive a-th
+    root of unity.  p(x) is reduced modulo x:a - 1 but not modulo phi_a(x).
+RETURN: 
+	          OK or ERROR
+
+NAME:   
+	          field_check_cyclo
+SYNOPSIS: 
+	        INT field_check_cyclo(a) OP a;
+DESCRIPTION: 
+	     Check if element of field element , the CYCLOTOMIC
+	object a, is essentially an INTEGER,
+    and if so, transform to an object of type INTEGER.
+RETURN: 
+	          OK or ERROR
+
+NAME:   
+                  field_check_sqrad
+SYNOPSIS: 
+                  INT field_check_sqrad(a) OP a;
+DESCRIPTION: 
+	     Check if element of field element, the SQ_RADICAL 
+	object a, is essentially an INTEGER,
+    and if so, transform to an object of type INTEGER.
+RETURN: 
+	          OK or ERROR
+
+NAME:
+	make_scalar_cyclo
+SYNOPSIS:
+	INT make_scalar_cyclo(a,b) OP a,b;
+DESCRIPTION:
+	transfer a scalar object l into an CYCLOTOMIC object b.
+
+NAME:           
+	  make_index_coeff_power_cyclo
+SYNOPSIS:
+	         INT make_index_coeff_power_cyclo(a,b,c,d) OP a,b,c,d;
+DESCRIPTION:
+	      The monomial b * x:c is treated as a cyclotomic number,
+    where x is the basic primitive a-th root of unity.  A cyclo d is
+    constructed corresponding to this number.
+RETURN:           
+	OK or ERROR
+
+NAME:  
+	           scan_cyclo
+SYNOPSIS:
+	         INT scan_cyclo(a) OP a;
+DESCRIPTION:
+	      Input a cyclo directly from standard input.
+	Subroutine of the general routine scan.
+RETURN:
+	           OK or ERROR
+
+
+NAME:
+	add_scalar_cyclo
+SYNOPSIS:
+	INT add_scalar_cyclo(a,b,c) OP a,b,c;
+DESCRIPTION:
+	this is a subroutine of the general routine add
+
+NAME:
+	 mult_scalar_cyclo
+SYNOPSIS:
+	INT mult_scalar_cyclo(a,b,c) OP a, b, c;
+DESCRIPTION:
+        this is a subroutine of the general routine mult
+
+NAME:
+	add_cyclo_cyclo
+SYNOPSIS:
+	INT add_cyclo_cyclo(a,b,c) OP a,b,c; 
+DESCRIPTION:
+	 c is completely tidied. 
+	this is a subroutine of the general routine add
+
+NAME:
+	mult_cyclo_cyclo
+SYNOPSIS:
+	INT mult_cyclo_cyclo(a,b,c) OP a,b,c;
+DESCRIPTION:
+	 c is completely tidied.
+	this is a subroutine of the general routine mult
+
+NAME:
+	add_cyclo
+SYNOPSIS:
+	INT add_cyclo(a,b,c) OP a,b,c;
+DESCRIPTION:
+        this is a subroutine of the general routine add
+
+NAME:
+	add_apply_cyclo
+SYNOPSIS:
+	INT add_apply_cyclo(a,b) OP a,b;
+DESCRIPTION:
+    Adds a cyclo to an object of type INTEGER, LONGINT, BRUCH, SQ_RADICAL,
+    CYCLOTOMIC or POLYNOM.
+	this is a subroutine of the general routine add_apply
+
+NAME:
+	mult_cyclo
+SYNOPSIS:
+	INT mult_cyclo(a,b,c) OP a,b,c;
+DESCRIPTION:
+        this is a subroutine of the general routine mult
+NAME:
+	 mult_apply_cyclo
+SYNOPSIS:
+	INT mult_apply_cyclo(a,b) OP a,b;
+DESCRIPTION:
+    Multiplies a cyclo with an object of type INTEGER, LONGINT, BRUCH,
+    SQ_RADICAL, CYCLOTOMIC, POLYNOM, SCHUBERT, VECTOR or MATRIX.
+	this is a subroutine of the general routine mult_apply
+
+NAME:
+	addinvers_cyclo
+SYNOPSIS:
+	INT addinvers_cyclo(a,b) OP a,b;
+DESCRIPTION:
+	this is a subroutine of the general routine addinvers
+NAME:
+	addinvers_apply_cyclo
+SYNOPSIS:
+	INT addinvers_apply_cyclo(a) OP a;
+DESCRIPTION:
+        this is a subroutine of the general routine addinvers_apply
+
+
+NAME:
+	invers_cyclo
+SYNOPSIS:
+	INT invers_cyclo(a,b) OP a,b;
+DESCRIPTION:
+	this is a subroutine of the general routine invers
+NAME:
+	nullp_cyclo
+SYNOPSIS:
+	INT nullp_cyclo(a) OP a;
+DESCRIPTION:
+        this is a subroutine of the general routine nullp
+
+NAME:
+	comp_cyclo
+SYNOPSIS:
+	INT comp_cyclo(a) OP a;
+DESCRIPTION:         
+	Uses comp_list on the self fields.
+
+NAME:
+	             conj_cyclo
+SYNOPSIS:
+	         INT conj_cyclo(a,b,c) OP a,b,c;
+DESCRIPTION:
+	      If a represents the cyclotomic number p(x), where x is the
+    basic primitive n-th root of unity, c is a cyclo representing the number
+    p(x:b).  If b is coprime to n, this is an algebraic conjugate of p(x).
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           tex_cyclo
+SYNOPSIS:
+	         INT tex_cyclo(a) OP a;
+DESCRIPTION:
+	      Outputs a cyclo in a form suitable for TeX processing.
+    Each term of the self is expressed in the form:
+    coefficient * \omega_{index} : (self).
+RETURN:
+	           OK or ERROR
+
+
+NAME: 
+	            setup_cyclotomic_table
+SYNOPSIS: 
+	        INT setup_cyclotomic_table()
+DESCRIPTION:
+	      Reads the table of cyclos from the file CYCLOS.DAT. The first
+    entry should be no_cyclos, then the list of cyclo_data.  Returns OK if the
+    table is set; otherwise, returns ERROR.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           print_cyclo_data
+SYNOPSIS:
+	         INT print_cyclo_data(ptr) CYCLO_DATA *ptr;
+DESCRIPTION:
+	      Prints at stdout the cyclotomic data pointed to by ptr,
+    prefacing the entries by Index, Degree, Polynomial and Automorphism
+    exponents respectively.
+RETURN:
+
+NAME:  
+	           print_cyclo_table
+SYNOPSIS:
+	         INT print_cyclo_table()
+DESCRIPTION:
+	      Prints the data corresponding to each item on the cyclo table.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           print_cyclo_list
+SYNOPSIS:
+	         INT print_cyclo_list()
+DESCRIPTION:
+	      Prints the data corresponding to each item on the cyclo list.
+RETURN:
+	           OK or ERROR
+
+NAME:  
+	           save_cyclo_list
+SYNOPSIS:
+	         INT save_cyclo_list()
+DESCRIPTION:
+	      Appends the data corresponding to each item on the cyclo list
+    to the file CYCLOS.DAT -- the file is created if it does not exist. There
+    is no check for duplication of data.
+RETURN:
+	           OK or ERROR
+
+COMMENT:
+	----------------------------------------------------------------------
+
+	GENERAL ROUTINES
+	----------------
+
+	NAME                                     DESCRIPTION
+	----------------------------------------------------------------------
+	add()
+	mult()
+	addinvers()
+	invers()
+	nullp()
+	comp()
+	copy()
+	fprint()
+	fprintln()
+	freeall()
+	freeself()
+	objectread()
+	objectwrite()
+	scan()
+	tex()
+
+COMMENT:
+	############################################################
+	STATIC.DOC
+	##########
+
+	THE STATIC ROUTINES
+	-------------------
+
+	NAME:             integer_factor_0
+	SYNOPSIS:         static INT integer_factor_0(a,l,g,m,first_prime)
+				OP a,l,g,m, first_prime;
+	DESCRIPTION:      This routine factorizes an integer using the table of primes.
+	    a is the integer to be factored; l is a monopoly in which the prime factors
+	    of a, which are contained in the table, and their exponents are inserted as
+	    monomials with the primes as the selfs and the exponents as the koeffs;
+	    g is the remaining factor; m is the last number tried as a factor.
+	    If it is non-NULL, first_prime is set to the first prime factor and the
+	    routine returns as soon as it is found.  For a full factorization, it
+	    must be set to NULL.  The parameters a,l,g,m and first_prime must be
+	    different.
+	RETURN:           OK or ERROR
+
+	NAME:             integer_factor_1
+	SYNOPSIS:         static INT integer_factor_1(a,f1,f2,b,l,first_prime)
+				OP a,f1,f2,b,l,first_prime;
+	DESCRIPTION:      This routine finds all prime factors of the integer a
+	    between two bounds f1 (the lower) and f2.  If f1 is even, it is replaced
+	    by f1 + 1.  l is a monopoly in which the prime factors of a, between the
+	    given bounds, and their exponents are inserted as monomials with the
+	    primes as the selfs and the exponents as the koeffs.  b is set to the
+	    remaining factor.  If it is non-NULL, first_prime is set to the first
+	    prime factor and the routine returns as soon as it is found.
+	    For a full factorization, it must be set to NULL.  The parameters a,l,b,
+	    f1,f2 and first_prime must be different.
+	RETURN:           OK or ERROR
+
+	NAME:             integer_factor_2 /*   deleted     */
+	SYNOPSIS:
+	DESCRIPTION:      This routine finds a partial prime factorisation of the
+	    integer a with all the primes on a list l0.  l is a monopoly to hold the
+	    factorisation and b is set to the remaining factor.  a,l,b,l0 must be
+	    different.
+	RETURN:           OK or ERROR
+
+	NAME:             integer_factor
+	SYNOPSIS:         static INT integer_factor(a,l) OP a,l;
+	DESCRIPTION:      This is the main integer factorization routine.
+	    a is the integer to be factored. l is a monopoly to hold the factorisation.
+	    l need not be initialized to a MONOPOLY.
+	RETURN:           OK or ERROR
+
+	NAME:             callocnumber
+	SYNOPSIS:         static struct number * callocnumber()
+	DESCRIPTION:      Creates a number object and returns a pointer to it.
+	RETURN:           A pointer or NULL
+
+	NAME:             insert_zero_into_monopoly
+	SYNOPSIS:         static INT insert_zero_into_monopoly(a) OP a;
+	DESCRIPTION:      Converts an empty monopoly into a non-empty one.
+	RETURN:           OK or ERROR
+
+	NAME:             find_sqrad_data
+	SYNOPSIS:         static INT find_sqrad_data(a) OP a;
+	DESCRIPTION:      Finds the list of prime factors of the radicals of a
+	    sqrad a and -1 if one of these radicals is negative, and inserts this list
+	    in the appropriate field of a.
+	RETURN:           OK or ERROR
+
+	NAME:             adjust_sqrad_data
+	SYNOPSIS:         static INT adjust_sqrad_data(a) OP a;
+	DESCRIPTION:      This adjusts an incomplete data list of primes for the
+	    sqrad a to make it complete.  It may result in the list having too many
+	    primes.
+	RETURN:           OK or ERROR
+
+	NAME:             conj_sqrad
+	SYNOPSIS:         static INT conj_sqrad(a,b,c) OP a,b,c;
+	DESCRIPTION:      Obtains the conjugate of the sqrad a with respect to the
+	    automorphism x + y * \sqrt(b) -> x - y * \sqrt(b) of the number field
+	    F = E(\sqrt(b)), where [E:F] = 2, and F is generated by the square roots
+	    of the elements on the data list of a. The variable c returns the
+	    conjugate.
+	RETURN:           OK or ERROR
+
+	NAME:             convert_sqrad_scalar
+	SYNOPSIS:         static INT convert_sqrad_scalar(a) OP a;
+	DESCRIPTION:      If a is a sqrad not involving radicals, it is converted to a
+	    scalar -- the coefficient of \sqrt(1).
+	RETURN:           OK or ERROR
+
+	NAME:             make_index_monopoly_cyclo
+	SYNOPSIS:         static INT make_index_monopoly_cyclo(a,b,c,tid)
+				OP a,b,c; int tid;
+	DESCRIPTION:      Given a positive integer a and a monopoly b corresponding to
+	    the polynomial p(x), a cyclo c is constructed whose index is a and which
+	    repersents the cyclotomic number p(x) where x is the basic primitive a-th
+	    root of unity.  The parameter tid specifies the amount of tidying up
+	    required -- see the standardise_cyclo routine.
+	RETURN:           OK or ERROR
+
+	NAME:             standardise_cyclo
+	SYNOPSIS:         static INT standardise_cyclo(a,tid) OP a; int tid;
+	DESCRIPTION:     This routine carries out a tidying-up process on the
+	    monopoly p(x) corresponding to the cyclo a.  If tid = 0, the monopoly
+	    p(x) is not tidied up in any way. if tid = 1, p(x) is reduced modulo
+	    x:n - 1; and if tid = 2, it is reduced modulo phi_n(x), where n denotes
+	    the index.
+	RETURN:           OK or ERROR
+
+	NAME:             add_cyclo_cyclo_0
+			  mult_cyclo_cyclo_0
+	SYNOPSIS:         static INT add_cyclo_cyclo_0(a,b,c,tid) OP a,b,c; int tid;
+			  static INT mult_cyclo_cyclo_0(a,b,c,tid) OP a,b,c; int tid;
+	DESCRIPTION:      Adding and multiplying with tidying facilities.
+	RETURN:           OK or ERROR
+
+	NAME:             invers_cyclo_norm
+	SYNOPSIS:         static INT invers_cyclo_norm(a,b,c) OP a,b,c;
+	DESCRIPTION:      Calculates the inverse and norm of the cyclo a and returns
+	    them as b and c respectively. The norm of a is the product of its
+	    conjugates in the cyclotomic field corresponding to the index of a.
+	RETURN:           OK or ERROR
+
+	NAME:             add_cyclo_data
+	SYNOPSIS:         static CYCLO_DATA *add_cyclo_data(index) OP index;
+	DESCRIPTION:      Creates the data associated with a new cyclotomic index
+	    and appends it to the global list of cyclotomic data. A pointer to this
+	    data is returned.
+	RETURN:           pointer or NULL
+
+	NAME:             cyclo_ptr
+	SYNOPSIS:         static CYCLO_DATA *cyclo_ptr(index) OP index;
+	DESCRIPTION:
+	DESCRIPTION:      Returns a pointer to data associated with the cyclotomic index
+	    given -- the pointer points to a table item or a list item -- or NULL if
+	    the data is neither on the table or the list.
+	RETURN:           pointer or NULL
+
+	static INT convert_cyclo_scalar(a) OP a;
+	NAME:             convert_cyclo_scalar
+	SYNOPSIS:         static INT convert_cyclo_scalar(a) OP a;
+	DESCRIPTION:      If a is a cyclo not involving roots of unity, it is converted
+	    to a scalar -- the coefficient of x:0.
+	RETURN:           OK or ERROR
+
+	############################################################
+

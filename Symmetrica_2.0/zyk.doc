@@ -1,0 +1,184 @@
+COMMENT:
+	ZYK
+	___
+
+
+	We are describing the routines of the file zyk.c. These are routines
+	for the computation of cycle index polynomials, and for the computation
+	with general permutation groups. 
+
+
+NAME:		
+	zykelind_Sn
+SYNOPSIS:
+		INT zykelind_Sn(OP n,pol)
+DESCRIPTION:
+		computes the cycleindex polynomial of the symmetric
+	group of the degree n. n is a INTEGER object, pol becomes a
+	POLYNOM object.
+BUG:
+			n and pol must be different
+
+
+NAME:
+			zykelind_Dn
+SYNOPSIS:
+		INT zykelind_Dn(OP n,pol)
+DESCRIPTION:
+		computes the cycleindex polynomial of the dihedral
+	group of the degree n. n is a INTEGER object, pol becomes a
+	POLYNOM object.
+BUG:
+			n and pol must be different
+
+NAME:
+			zykelind_Cn
+SYNOPSIS:
+		INT zykelind_Cn(OP n,pol)
+DESCRIPTION:
+		computes the cycleindex polynomial of the cyclic
+	group of the degree n. n is a INTEGER object, pol becomes a
+	POLYNOM object.
+BUG:
+			n and pol must be different
+
+NAME:
+			zykelind_An
+SYNOPSIS:
+		INT zykelind_An(OP n,pol)
+DESCRIPTION:
+		computes the cycleindex polynomial of the alternating
+	group of the degree n. n is a INTEGER object, pol becomes a
+	POLYNOM object.
+BUG:
+			n and pol must be different
+
+NAME:
+			zykelind_arb
+SYNOPSIS:
+		INT zykelind_arb(OP vec,pol)
+DESCRIPTION:
+		computes the cycle index polynomial of a arbitrary permutation
+	group . vec is a VECTOR object, whose entries are PERMUTATION 
+	objects whose degrees are equal. These permutations are the generators
+	of the group.  pol becomes a POLYNOM object.
+BUG:
+			vec and pol must be different
+
+NAME:
+			dimino
+SYNOPSIS:
+		INT dimino(OP vec)
+DESCRIPTION:
+		computes the elements of a arbitrary permutation group.
+	vec is a VECTOR object, whose elements are PERMUTATION objects,
+	which generates the group. At the end of dimino, this vector
+	contains all elements of the group.
+BUG:
+			the permutations in the vector must be of the same
+	degree, and they must be of VECTOR type.
+
+NAME:
+			polya_n_sub
+SYNOPSIS:
+		INT polya_n_sub(OP p,n,e)
+DESCRIPTION:
+		you enter a POLYNOM object p, and a INTEGER object n, and
+	the output is the POLYNOM object which you get using the substitution
+	x_i --> a_1^i + ... + a_n^i 
+
+NAME:
+			grf_Sn
+SYNOPSIS:
+		INT grf_Sn(OP degree, OP n, OP result)
+DESCRIPTION:
+		you enter the degree of the symmetric group, and the number of
+	variables for the polya substitution. The routine computes the group reduction
+  	function. The first step is the computation of cycle index and the second step is
+	the polya substitution with n variables.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	ANFANG
+	sscan("9",INTEGER,a); sscan("4",INTEGER,b); 
+	grf_Sn(a,b,c); println(c);
+	ENDE
+
+NAME:
+			grf_Cn
+SYNOPSIS:
+		INT grf_Cn(OP degree, OP n, OP result)
+DESCRIPTION:
+		you enter the degree of the cyclic group, and the number of
+	variables for the polya substitution. The routine computes the group reduction
+  	function. The first step is the computation of cycle index and the second step is
+	the polya substitution with n variables.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	ANFANG
+	sscan("9",INTEGER,a); sscan("4",INTEGER,b); 
+	grf_Cn(a,b,c); println(c);
+	ENDE
+
+
+
+NAME:
+			grf_An
+SYNOPSIS:
+		INT grf_An(OP degree, OP n, OP result)
+DESCRIPTION:
+		you enter the degree of the alternating group, and the number of
+	variables for the polya substitution. The routine computes the group reduction
+  	function. The first step is the computation of cycle index and the second step is
+	the polya substitution with n variables.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	ANFANG
+	sscan("9",INTEGER,a); sscan("4",INTEGER,b); 
+	grf_An(a,b,c); println(c);
+	ENDE
+
+
+NAME:
+			grf_Dn
+SYNOPSIS:
+		INT grf_Dn(OP degree, OP n, OP result)
+DESCRIPTION:
+		you enter the degree of the dihedral group, and the number of
+	variables for the polya substitution. The routine computes the group reduction
+  	function. The first step is the computation of cycle index and the second step is
+	the polya substitution with n variables.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	ANFANG
+	sscan("9",INTEGER,a); sscan("4",INTEGER,b); 
+	grf_Dn(a,b,c); println(c);
+	ENDE
+
+NAME:
+                        grf_arb
+SYNOPSIS:
+                INT grf_arb(OP generators, OP n, OP result)
+DESCRIPTION:
+                you enter the generators (VECTOR of PERMUTATION objects) 
+	of a permutaion group, and the number of
+        variables for the polya substitution. The routine computes the group reduction
+        function. The first step is the computation of cycle index and the second step is
+        the polya substitution with n variables.
+EXAMPLE:
+        #include "def.h"
+        #include "macro.h"
+
+        ANFANG
+        sscan("[[6,5,4,3,2,1,8,7],[2,1,8,7,6,5,4,3],[5,6,7,8,1,2,3,4]]",
+		PERMUTATIONVECTOR,a); sscan("4",INTEGER,b);
+        grf_arb(a,b,c); println(c);
+        ENDE
+

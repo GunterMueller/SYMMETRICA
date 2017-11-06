@@ -1,0 +1,324 @@
+COMMENT:
+
+SYMCHAR
+
+This is the structure for the characters of the symmetric
+group. There is the degree of the symmetric group,
+the vector of the partitions, labeling the classes,
+and the vector of the values of the characters on the
+single classes. The partitions in the the lists are in the
+order you get using makevectorofparts().
+
+There are the following standard routines, macros
+
+NAME            MACRO              DESCRIPTION
+s_sc_d		S_SC_D		   select_symchar_dimension
+s_sc_di 	S_SC_DI 	   select_symchar_dimension_as_INT
+s_sc_w          S_SC_W             select_symchar_werte
+s_sc_wl         S_SC_WL            select_symchar_werte_length
+s_sc_wli        S_SC_WLI           select_symchar_werte_length_as_INT
+s_sc_wi         S_SC_WI            select_symchar_werte_ith_entry
+s_sc_p          S_SC_P             select_symchar_partition
+s_sc_pl         S_SC_PL            select_symchar_partition_length
+s_sc_pli        S_SC_PLI           select_symchar_partition_length_as_INT
+s_sc_pi         S_SC_PI            select_symchar_partition_ith_entry
+
+
+
+NAME:		
+	m_d_sc
+SYNOPSIS:	
+	INT m_d_sc(OP dim,sc)
+DESCRIPTION:	
+	you only enter an INTEGER object dim, and the output 
+	is a SYMCHAR object sc, which is the null-character of the
+	symmetric group of degree dim. null-character means that the
+	value of the character is zero on all classes.
+RETURN:		
+	OK if no error occured
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b;
+	anfang();
+	a=callocobject(); 
+	b=callocobject(); 
+	scan(INTEGER,a);
+	m_d_sc(a,b);
+	println(b);
+	freeall(a); /* a is not part of b */
+	freeall(b);
+	ende();
+	}
+NAME:		
+	b_d_sc
+SYNOPSIS:	
+	INT b_d_sc(OP dim,sc)
+DESCRIPTION:	
+	you only enter an INTEGER object dim, and the output 
+	is a SYMCHAR object sc, which is the null-character of the
+	symmetric group of degree dim. null-character means that the
+	value of the character is zero on all classes. dim will be part
+	of the resulting SYMCHAR object.
+RETURN:		
+	OK if no error occured
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b;
+	anfang();
+	a=callocobject(); 
+	b=callocobject(); 
+	scan(INTEGER,a);
+	m_d_sc(a,b);
+	println(b);
+	/* do not free a, because it is  part of b */
+	freeall(b);
+	ende();
+	}
+
+NAME:       
+	chartafel
+SYNOPSIS:   
+	INT chartafel(OP degree,  res)
+DESCRIPTION: 	
+	you enter the degree of the symmetric group, as INTEGER 
+	object and the result is a MATRIX object: the charactertable 
+	of the symmetric group of the given degree.
+RETURN: 	
+	OK if no error occured.
+
+NAME:       
+	charvalue
+SYNOPSIS:   
+	INT charvalue(OP irred, class, res, table)
+DESCRIPTION: 
+	you enter a PARTITION object part, labelling the irreducible
+      character, you enter a PARTITION object class, labeling the class
+      or class may be a PERMUTATION object, then result becomes the value
+      of that character on that class or permutation. Note that the
+      table may be NULL, in which case the value is computed, or it may be 
+      taken from a precalculated charactertable.
+BUG:
+	it would be nice to enter skewpartition as label of characters
+	but this is not yet implemented
+
+NAME:       
+	c_ijk_sn
+SYNOPSIS:   
+	INT c_ijk_sn(OP i,j,k,res)
+DESCRIPTION: 
+	computes the coefficients of the class multiplication in the
+      groupalgebra of the S_n. It uses the method described in
+      Curtis/Reiner: Methods of representation theory I p. 216
+EXAMPLE: 
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c,g;
+	anfang();
+	a=callocobject(); b=callocobject(); 
+	c=callocobject(); g=callocobject(); 
+	scan(PARTITION,a); println(a);
+	scan(PARTITION,b); println(b);
+	scan(PARTITION,c);  println(c);
+	c_ijk_sn(a,b,c,g); println(g);
+	freeall(a); freeall(b); freeall(c); freeall(g);
+	ende();
+	}
+
+
+NAME:       
+	kranztafel
+SYNOPSIS:   
+	INT kranztafel(OP a,b,res,co,cl)
+DESCRIPTION: 
+	you enter the INTEGER objects, say a and b, and res becomes a
+      MATRIX object, the charactertable of S_b \wr S_a, co becomes a
+      VECTOR object of classorders and cl becomes a VECTOR object of
+      the classlabels.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c,d,e;
+	anfang();
+	a=callocobject(); b=callocobject(); 
+	c=callocobject(); d=callocobject(); e=callocobject(); 
+
+	scan(INTEGER,a); scan(INTEGER,b);
+	kranztafel(a,b,c,d,e);
+	println(c); println(d); println(e);
+
+	freeall(a); freeall(b); freeall(c); freeall(d); freeall(e);
+	ende();
+	}
+
+NAME:       
+	m_part_centralsc
+SYNOPSIS:   
+	INT m_part_centralsc(OP part,res)
+DESCRIPTION: 
+	computes the central character, the SYMCHAR object res of
+            the given partition the PARTITION object part.
+
+NAME:       
+	m_part_sc
+SYNOPSIS:   
+	INT m_part_sc(OP part,res)
+DESCRIPTION: 
+	computes the irreducible character, the SYMCHAR object res of
+            the given partition the PARTITION object part.
+
+COMMENT:
+There is a helpful coroutine which does the same but uses the character
+table which must have been computed before.
+
+NAME:       
+	m_part_sc_tafel
+SYNOPSIS:   
+	INT m_part_sc_tafel(OP part,res,table)
+DESCRIPTION: 
+	computes the irreducible character, the SYMCHAR object res of
+           the given partition the PARTITION object part. The MATRIX object 
+           table is the charactertable for the symmetric group with 
+           degree = weight of part. You must specify table = NULL if the 
+           table is not known.
+
+
+NAME:       
+	ntopaar_symchar
+SYNOPSIS:   
+	INT ntopaar_symchar(OP a,b)
+DESCRIPTION: 
+	a is SYMCHAR object, a character of S_n, b becomes the
+           induced character in S_(n over 2), the induced operation on
+           the pairs
+
+NAME:       
+	reduce_symchar
+SYNOPSIS:   
+	INT reduce_symchar(OP sym, erg)
+DESCRIPTION: 
+	you enter a SYMCHAR object sym and in erg you get the 
+            decomposition into irreducible characters, this is a SCHUR object.
+            If erg is not an empty object it is freed first.
+EXAMPLE:	
+	The following program asks first for the degree of the
+	symmetric group, than for the max and min value of the character
+	values of the symmetric group character. These values are
+	initialised with random value inside the given limits.
+	The character is decomposed into irreducible characters.
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c,d,e;
+	INT i;
+	anfang();
+	a=callocobject(); b=callocobject(); 
+	c=callocobject(); d=callocobject(); e=callocobject(); 
+
+	printeingabe("degree of S_n"); scan(INTEGER,a);
+	printeingabe("min value of character"); scan(INTEGER,c);
+	printeingabe("max value of character"); scan(INTEGER,d);
+	m_d_sc(a,b); println(b);
+	for (i=0L;i<S_SC_WLI(b);i++)
+		random_integer(S_SC_WI(b,i),c,d);
+
+	println(b); reduce_symchar(b,e); println(e);
+	freeall(a); freeall(b); freeall(c); freeall(d); freeall(e);
+	ende();
+	}
+
+COMMENT:
+This was a special case of the following routine:
+
+NAME:       
+	reduce_symchar_tafel
+SYNOPSIS:   
+	INT reduce_symchar_tafel(OP sym, erg,ct)
+DESCRIPTION: 
+	you enter a SYMCHAR object sym and in erg you get the 
+	decomposition into irreducible characters, this is a SCHUR object.
+	You can provide the charactertable in ct, or you specify ct==NULL.
+
+
+NAME:       
+	scalarproduct_symchar
+SYNOPSIS:   
+	INT scalarproduct_symchar(OP char1, char2, res)
+DESCRIPTION: 
+	res becomes the scalarproduct of the two SYMCHAR objects
+	char1 and char2. You should use the general routine
+	scalarproduct instead of this special routine.
+
+NAME:		
+	t_SCHUR_SYMCHAR
+SYNOPSIS:	
+	INT t_SCHUR_SYMCHAR(OP sp, res)
+DESCRIPTION:	
+	the input is a SCHUR object sp, this is a sum of 
+	partitions with coefficent, this is interpreted as a decomposition
+	of a charcter into irreducible ones. This sum of irreducible
+	characters is computed, and will be the output, the SYMCHAR 
+	object res. If the partitions are of different weight, you
+	will get an error. If the input is not a SCHUR object, the routine
+	copies sp to res.
+	More or less this routines computes the Frobenius isometry.
+
+
+NAME:		
+	young_character
+SYNOPSIS:	
+	INT young_character(OP part,res,table)
+DESCRIPTION:	
+	computes the young_character labeled by the PARTITION
+	object part. The result is a SYMCHAR object res. The third parameter
+	allows to specify the precomputed young table, if you dont
+	have it you have to enter NULL
+
+
+COMMENT:
+GENERAL ROUTINES:
+-----------------
+add()
+addinvers()
+comp()
+einsp()				true if the character is 1 on all classes
+fprint()
+fprintln()
+freeall()
+freeself()
+hoch()
+mult()
+mult_apply()
+nullp()				true if the character is 0 on all classes
+objectread()
+objectwrite()
+print()
+println()
+scalarproduct()
+tex()
+
+NAME:       
+	an_tafel
+SYNOPSIS:   
+	INT an_tafel(OP degree,  res)
+DESCRIPTION: 	
+	you enter the degree of the alternating group, as INTEGER 
+	object and the result is a MATRIX object: the charactertable 
+	of the alternating group of the given degree. This routine may be substitute
+	by the routines using group labels.
+RETURN: 	
+	OK if no error occured.
+

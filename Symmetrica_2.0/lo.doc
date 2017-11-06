@@ -1,0 +1,118 @@
+COMMENT:
+	LONGINT
+	-------
+	There is no documentation on the internal structure of the 
+	longinter arithmetic.
+
+NAME:
+        mult_longint
+SYNOPSIS:
+        INT mult_longint(OP a,b,c)
+DESCRIPTION:
+        this is a undocumented subroutine of INT mult(OP a,b,c)
+        You better use this general routine.
+
+NAME:
+        add_longint
+SYNOPSIS:
+        INT add_longint(OP a,b,c)
+DESCRIPTION:
+        this is a undocumented subroutine of INT add(OP a,b,c)
+        You better use this general routine.
+
+NAME:
+        invers_longint
+SYNOPSIS:
+        INT invers_longint(OP a,b)
+DESCRIPTION:
+        this is a undocumented subroutine of INT invers(OP a,b)
+        You better use this general routine.
+
+NAME:
+        copy_longint
+SYNOPSIS:
+        INT copy_longint(OP a,b)
+DESCRIPTION:
+        this is a undocumented subroutine of INT copy(OP a,b)
+        You better use this general routine.
+
+NAME:
+        dec_longint
+SYNOPSIS:
+        INT dec_longint(OP a)
+DESCRIPTION:
+        this is a undocumented subroutine of INT dec(OP a). The
+        INTEGER object a is decreased by 1.
+        You better use the general routine dec.
+
+
+NAME:
+        tex_longint
+SYNOPSIS:
+        INT tex_longint(OP a)
+DESCRIPTION:
+        this is a undocumented subroutine of INT tex(OP a). The
+        INTEGER object a is transformed into tex-source-code.
+        You better use the general routine tex.
+
+NAME:
+        inc_longint
+SYNOPSIS:
+        INT inc_longint(OP a)
+DESCRIPTION:
+        this is a undocumented subroutine of INT inc(OP a). The
+        INTEGER object a is increased by 1.
+        You better use the general routine inc.
+
+
+NAME:		
+	random_longint
+SYNOPSIS:	
+	INT random_longint(OP a,b)
+DESCRIPTION:	
+	this computes a pseudo-random LONGINT number. 
+	There are two possible calls, if b is a LONGINT number, it is 
+	a new limit for  the random LONGINT objects, if it is NULL
+	the old limit is used. The first limit is set during
+	initialisation of SYMMETRICA.
+	
+COMMENT:
+	There is a pair of routines for the  transformation from LONGINT to INT
+	and vice versa. 
+
+NAME:   
+     	t_int_longint
+SYNOPSIS:    
+	INT t_int_longint(OP a,b)
+DESCRIPTION: 
+	transforms the INTEGER object a into 
+	 LONGINT object b. a and b may be equal objects.
+RETURN:      
+	OK if no error
+
+NAME:        
+	t_longint_int
+SYNOPSIS:    
+	INT t_longint_int(OP a)
+DESCRIPTION: 
+	transforms the LONGINT object a into an INTEGER object,
+	if it is possible, this means that the number which is
+	represented by a, is small enough.
+RETURN:      
+	OK if no error
+
+
+
+
+COMMENT:
+	GENERAL ROUTINES
+	----------------
+
+	add()
+	add_apply()
+	invers()
+	mult()
+	mult_apply()
+	scan()
+	sscan();
+	tex()        		tex-output

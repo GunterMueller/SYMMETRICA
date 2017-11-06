@@ -1,0 +1,632 @@
+COMMENT:
+		PERMUTATION
+		-----------
+
+		Permutations are implemented as a structure of two 
+		components, the first component codes the special kind
+		of the implementation, it is whether we have a list
+		or a cycle structure. The second part are the datas,
+		it is a VECTOR object of INTEGER object, the content 
+		depends on the  kind information. At the moment there two
+		kinds: VECTOR i.e. this is the list form, and ZYKEL.
+		In both cases the numbering starts with 1, not with
+		0. The type VECTOR means, that we store the images of
+		1 to n as a list, so at the i-th position we have the
+		image of i, if the type is ZYKEL, we store the permutation
+		as a product of cycles, the cycles are written in a form,
+		that the smallest entry is first, we store the cycle with
+		the biggest first entry first. So the two following 
+		permutations are equal:
+
+		VECTOR:           [2,3,6,10,5,7,4,9,8,1]
+		ZYKEL:            (8,9)(5)(1,2,3,6,7,4,10)
+
+		Internally both are a VECTOR object of INTEGER objects. So the
+		ZYKEL-type would be the INTEGER VECTOR
+				  [8,9,5,1,2,3,6,7,4,10]
+		The type VECTOR is the default type of PERMUTATION objects.
+
+		There are the standard routines and macros
+
+		NAME         MACRO              DESCRIPTION
+		---------------------------------------------------------
+		c_p_k        C_P_K              change_perm_kind
+		c_p_s        C_P_S              change_perm_self
+		s_p_k        S_P_K              select_perm_kind
+		s_p_i        S_P_I              select_perm_ith_element
+		s_p_ii       S_P_II             select_perm_ith_element_as_INT
+		s_p_l        S_P_L              select_perm_length
+		s_p_li       S_P_LI             select_perm_length_as_INT
+		s_p_s        S_P_S              select_perm_self
+		b_ks_p
+		m_ks_p
+		m_il_p
+
+		CONSTRUCTOR, SELECTOR, MACROS
+		-----------------------------
+
+NAME: 	     
+	c_p_k
+SYNOPSIS:    
+	c_p_k(OP p, OBJECTKIND k)
+DESCRIPTION: 
+	changes the value, which indicates the type of the
+	PERMUTATION object p. Up to now there are only two kinds,
+	which are allowed, i.e. VECTOR and ZYKEL.  If you use
+	the macro, there will be no checks, on valid input
+	parameters.
+EXAMPLE:     
+	....
+	scan(PERMUTATION,a);
+	println(a);
+	c_p_k(a,ZYKEL);
+	println(a);
+	....
+
+	The data remains unchanged, but is interpreted as a
+	permutation in cycle notation, if you enter for example
+	the permutation (in list notation, which is the default)
+	[3,5,4,1,2]
+	the second println will output
+	(3,5,4)(1,2)
+	
+
+NAME:        
+	m_il_p
+SYNOPSIS:    
+	INT m_il_p(INT l; OP p)
+DESCRIPTION: 
+	builds a PERMUTATION object with empty entries of the
+       specified length l. The kind of p becomes VECTOR.
+EXAMPLE: 
+	This example reads with the standard C-function scanf a INT
+	variable from stdin, and generates a permutation of the entered
+	length, the entries of the list, representing the permutation are
+	empty objects ( = # ).
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a;
+	INT l;
+	anfang();
+	a = callocobject();
+	scanf("%ld",&l);
+	m_il_p(l,a);
+	println(a);
+	freeall(a);
+	ende();
+	}
+
+COMMENT:
+ROUTINES
+--------
+
+The following part contains information on routines, which
+are handling PERMUTATION objects.
+
+NAME:		
+	bruhat_comp_perm
+SYNOPSIS:	
+	INT  bruhat_comp_perm( OP a,b)
+DESCRIPTION:	
+	compares according to the Bruhat order. returns the
+	constant INT NONCOMPARABLE if the two PERMUTATION objects
+	a and b are not comparable. it return 0 if equal 1 if a>b
+	and -1 if a<b 
+	It only works for PERMUTATION objects  of kind VECTOR.
+	It works if the PERMUTATION objects are of different length.
+EXAMPLE:	
+	computes the matrix of comparision (c) and countes
+	the number of permutations which are samller.
+
+	scan(INTEGER,a);
+        fakul(a,b);
+        m_lh_m(b,b,c);
+        m_l_nv(b,e);
+        makevectorofperm(a,d);
+        for (i=0;i<S_V_LI(d);i++)
+        for (j=0;j<S_V_LI(d);j++)
+                m_i_i(bruhat_comp_perm(S_V_I(d,i),S_V_I(d,j)),S_M_IJ(c,i,j));
+
+        for (i=0;i<S_V_LI(d);i++)
+        for (j=0;j<S_V_LI(d);j++)
+                if (einsp(S_M_IJ(c,i,j))) inc(S_V_I(e,i));
+        for (i=0;i<S_V_LI(d);i++)
+                inc(S_V_I(e,i));
+        println(d);
+        println(e);
+                      
+
+
+NAME:        
+	diagramm_permutation
+SYNOPSIS:    
+	INT diagramm_permutation(OP perm,mat)
+DESCRIPTION: 
+	builds a quadratic MATRIX object
+BUG:         
+	perm and mat must be different.
+
+NAME:        
+	divideddifference
+SYNOPSIS:    
+	INT divideddifference(OP perm,poly,res)
+DESCRIPTION: 
+	applies the divided difference labeled by the
+      PERMUTATION object perm on the POLYNOM object poly, which
+      gives a new POLYNOM object res.
+
+NAME:        
+	elementarp_permutation
+SYNOPSIS:    
+	INT elementarp_permutation(OP a,b)
+DESCRIPTION: 
+	test whether the two PERMUTATION objects a and b
+      differ only by a elementary transposition. 
+RETURN:      
+	TRUE or FALSE
+BUG:		
+	a and b must be of type VECTOR
+
+NAME:
+	first_permutation
+SYNOPSIS:
+	INT first_permutation(OP n, OP res)
+DESCRIPTION:
+	computes the lexikographic first permutation of 
+	given degree.
+
+NAME:
+	last_permutation
+SYNOPSIS:
+	INT last_permutation(OP n, OP res)
+DESCRIPTION:
+	computes the lexikographic last permutation of 
+	given degree.
+
+NAME:
+	next_permutation
+SYNOPSIS:
+	INT next_permutation(OP ein, OP next)
+DESCRIPTION:
+	computes the lexikographic next permutation.
+
+NAME:		
+	first_perm_n_invers
+SYNOPSIS:	
+	INT first_perm_n_invers(OP n,in,p)
+DESCRIPTION:	
+	computes the first permutation of degree INTEGER object n
+	with INTEGER object in inversions. The result is a PERMUTATION 
+	object p of type VECTOR.
+
+NAME:	     
+	invers_permutation
+SYNOPSIS:    
+	INT invers_permutation(OP ein, OP a)
+DESCRIPTION: 
+	computes the inverse of the PERMUTATION object ein.
+	Better to use the general routine invers(OP,OP).
+NAME:	     
+	mult_permutation
+SYNOPSIS:    
+	INT mult_permutation(OP a, OP b, OP c)
+DESCRIPTION: 
+	computes the product of the two PERMUTATION objects 
+	a and b. The result is the composition a o b.
+	Better to use the general routine mult(OP,OP,OP).
+
+NAME:	     
+
+NAME:	     
+	fprint_permutation
+SYNOPSIS:    
+	INT fprint_permutation(FILE *fp, OP a)
+DESCRIPTION: 
+	prints a PERMUTATION object a to the file given by the
+	file pointer fp. This works for the type VECTOR and ZYKEL
+	of the PERMUTATION object a. In the case of VECTOR, which is the normal
+	list notation the list is printed with [ ] around it, the i-th
+	entry ith ethe image of i under the PERMUTATION object a. 
+	In the case of ZYKEL the cycles are inside ( ).
+BUG:	     
+	There is no test whether a and fp are valid values, it is
+	recommended to use the general routines fprint or print.
+
+NAME:        
+	lehmercode
+SYNOPSIS:    
+	INT lehmercode(OP a,b)
+DESCRIPTION: 
+	the lehmercode is a bijection between the permutations
+      	and a vector of integers. So if a is a PERMUTATION object
+      	b becomes the VECTOR of INTEGER objects, and if a is a 
+      	VECTOR of INTEGER objects, b becomes a PERMUTATION object.
+	It is possible to enter a==b.
+
+NAME:        
+	lehmercode_permutation
+SYNOPSIS:    
+	INT lehmercode_permutation(OP a,b)
+DESCRIPTION: 
+	the lehmercode is a bijection between the permutations
+      	and a vector of integers.  This routine computes the 
+	image of a PERMUATION object a under this bijection, the result 
+	is a VECTOR object of the same length. Better to use the general
+	routine lehmercode(OP,OP).
+
+NAME:	     
+	makevectoroftranspositions
+NAME:	     
+	makevectoroftranspositions
+SYNOPSIS:    
+	INT makevectoroftranspositions(OP deg, res)
+DESRIPTION:  
+	computes the VECTOR of all PERMUTATION objects of the entered
+	degree, which are transpositions.
+RETURN:	     
+	ERROR or OK
+
+NAME:        
+	m_part_perm
+SYNOPSIS:    
+	INT m_part_perm(OP a,b)
+DESCRIPTION: 
+	you enter a PARTITION object, and b becomes a 
+      PERMUTATION object, lying in the class labeled by a. It is
+      possible to enter a == b;
+      a must be a partition of type VECTOR
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a;
+	anfang();
+	a=callocobject();
+	scan(PARTITION,a); println(a);
+	m_part_perm(a,a); println(a);
+	freeall(a);
+	ende(); 
+	}
+
+NAME:	
+		m_perm_paareperm
+SYNOPSIS:	
+	INT m_perm_paareperm(OP a,b)
+DESCRIPTION:	
+	computes the operation of the PERMUTATION object a, on the
+	pairs, which are numbered in the lexicographic order. So if the
+	input is a permutation of the degree n, so the result is a permutation
+	of the degree (n over 2). 
+	The two objects a and b may the same.
+BUG:		
+	The PERMUTATION object a must be of VECTOR type
+RETURN:		
+	OK or not OK
+
+NAME:		
+	m_perm_rz_number
+SYNOPSIS:	
+	INT m_perm_rz_number(OP perm, OP res)
+DESCRIPTION:	
+	you enter a PERMUTATION object perm and the output
+	is a INTEGER object the number of
+	the reduced decompositions of this PERMUTATION object
+
+NAME:		
+		m_perm_rz_set
+SYNOPSIS:	
+		INT m_perm_rz_set(OP perm, OP vector)
+DESCRIPTION:	
+	you enter a PERMUTATION object perm and the output
+	is 
+	a VECTOR object, whose entries are the
+	reduced decompositions, which are again VECTOR object with
+	INTEGER object entries (see rz_perm)
+
+
+NAME:	
+		next_perm_invers
+SYNOPSIS:
+		INT next_perm_invers(OP p,pn)
+DESCRIPTION:
+		computes the next permutation of given degree and given
+	number of inversions. These values are fetched from the input
+	the PERMUTATION object p of type VECTOR. The object pn will be
+	the next permutation
+RETURN:
+			LAST_PERMUTATION if there is no next one.
+
+NAME:
+			next_shuffle_part
+SYNOPSIS:
+		INT next_shuffle_part(OP part, a,b)
+DESCRIPTION:
+	 	computes the next shuffle permutation (lex order) 
+	according to partition part. The return value is TRUE if the
+	routine succeded, FALSE if we already had the last permutation.
+
+
+
+NAME:  
+	      numberof_inversionen
+SYNOPSIS:
+	    INT numberof_inversionen(OP a,b)
+DESCRIPTION:
+	 you compute the number of inversions of the 
+	PERMUTATION object a. The result is the INTEGER object b.
+	The routine works for both types VECTOR and ZYKEL.
+BUG:   
+	      a and b must be different.
+
+NAME:  
+	      operate_perm_polynom
+SYNOPSIS:
+	    INT operate_perm_polynom(OP a,b,c)
+DESCRIPTION:
+	 apply the PERMUTATION object a to a POLYNOM object b
+	a changes the entries of the self-part of b according 
+	to the permutation, the result becomes the POLYNOM object c.
+	This works for arbitrary length of a. If we have a empty polynom,
+	i.e. the self-part is NULL, there is copy from b to c.
+BUG:   
+	      c must be different from a and b, the type of the
+	PERMUTATION a must be VECTOR.
+
+NAME:  
+	      operate_perm_vector
+SYNOPSIS:
+	    INT operate_perm_vector(OP a,b,c)
+DESCRIPTION:
+	 apply the PERMUTATION object a to a VECTOR object b
+	a changes the entries of b according to the permutation,
+	the result becomes the VECTOR object c. The length of the
+	PERMUTATION a must be smaller or equal to the length of
+	the VECTOR b.
+BUG:   
+	      c must be different from a and b, the type of the
+	PERMUTATION a must be VECTOR.
+
+NAME:
+			operate_perm_tableaux
+SYNOPSIS:
+		INT operate_perm_tableaux(OP a,b,c)
+DESCRIPTION:
+	 apply the PERMUTATION object a to a TABLEAUX object b
+	a changes the entries of b according to the permutation,
+	the result becomes the TABLEAUX object c. The length of the
+	PERMUTATION a must be smaller or equal to the length of
+	the VECTOR b.
+ 
+NAME:
+        perm_matrix
+SYNOPSIS:
+    INT perm_matrix(OP a,b)
+DESCRIPTION:
+	computes the permutation matrix. This is the matrix with
+	1 at the place (a_i, i) and 0 elsewhere. The permutation a must be
+	of the type VECTOR. a and b may be equal.
+	the return value is OK if no error occured.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	ANFANG
+	scan(PERMUTATION,a); println(a);
+	perm_matrix(a,a); println(a);
+	ENDE
+NAME:
+        random_permutation
+SYNOPSIS:
+    INT random_permutation(OP a,b)
+DESCRIPTION:
+ a is a INTEGER object, b becomes a random 
+	permutation of the given degree. The type of the PERMUTATION
+	b is VECTOR.
+BUG: 
+        a and b must be different
+      
+
+NAME:
+        rz_lehmercode
+SYNOPSIS:
+    INT rz_lehmercode(OP lc,erg)
+DESCRIPTION:
+	you input a VECTOR object which must be lehmercode
+	of a permutation, the output is a reduced decomposition of
+	the corresponding permutation.
+
+NAME:  
+      rz_perm
+SYNOPSIS:
+    INT rz_perm(OP perm,erg)
+DESCRIPTION:
+ computes a reduced decomposition of a permutation.
+	The input us a PERMUTATION object perm, and the result is
+	a VECTOR of INTEGER.  If you enter the identity, you get
+	an VECTOR of length 0.
+BUG: 
+        perm and erg must be different, so you may better use
+	the general routine  rz
+EXAMPLE:
+     perm = [3,4,6,5,1,2] will give the VECTOR
+        [2,1,3,2,5,4,3,5,4], which is to read from right to 
+        left as a product of elementary transpositions.
+
+NAME:	
+     scan_permutation_cycle
+SYNOPSIS:
+    INT scan_permutation_cycle(OP a)
+DESCRIPTION:
+	 as the default type of a PERMUTATION object is the
+	VECTOR notation, we need a special routine to input a
+	permutation of type ZYKEL. So the above routine reads
+	a PERMUTATION object from the standard input. You use it
+	instaed of scan(PERMUTATION,a) if you want to enter a
+	PERMUTATION object with kind ZYKEL instaed of a 
+	PERMUTATION object of type VECTOR
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a;
+	anfang();
+	a=callocobject(); 
+	scan_permutation_cycle(a);
+	println(a);
+	freeall(a);
+	ende();
+	}
+
+NAME:  
+	      signum_permutation
+SYNOPSIS:
+	    INT signum_permutation(OP a,b)
+DESCRIPTION:
+	 computes the signum a of the permutation b. a becomes
+        a INTEGER object. Better to use the global routine signum
+BUG:   
+	      a and be must be different
+      
+NAME:  
+	      test_perm
+SYNOPSIS: 
+	   INT test_perm()
+DESCRIPTION:
+	 tests the installation of PERMUTATION objects.
+     
+COMMENT:
+We have told, that there are two different kinds of PERMUTATION
+objects, they are called VECTOR and ZYKEL. To change one kind to the
+other there are the routines
+
+NAME:
+	        t_ZYKEL_VECTOR 
+SYNOPSIS:
+	    INT t_ZYKEL_VECTOR(OP a,b) 
+DESCRIPTION:
+	 a is a PERMUATION object of ZYKEL type
+      b becomes a PERMUTATION object of VECTOR type
+      a and b may be equal. t_zperm_vperm is a synonym 
+
+
+
+NAME:
+	        t_zperm_vperm 
+SYNOPSIS:
+	    INT t_zperm_vperm(OP a,b) 
+DESCRIPTION:
+	 a is a PERMUATION object of ZYKEL type
+      b becomes a PERMUTATION object of VECTOR type
+      a and b may be equal. t_ZYKEL_VECTOR is a synonym 
+
+
+
+NAME:
+	        t_VECTOR_ZYKEL 
+SYNOPSIS:
+	    INT t_VECTOR_ZYKEL(OP a,b) 
+DESCRIPTION:
+	 a is a PERMUATION object of VECTOR type
+      b becomes a PERMUTATION object of ZYKEL type
+      a and b may be equal. t_vperm_zperm is a synonym 
+
+
+
+NAME:
+	        t_vperm_zperm 
+SYNOPSIS:
+	    INT t_vperm_zperm(OP a,b) 
+DESCRIPTION:
+	 a is a PERMUATION object of VECTOR type
+      b becomes a PERMUTATION object of ZYKEL type
+      a and b may be equal. t_VECTOR_ZYKEL is a synonym 
+
+
+
+NAME:  
+      vexillaryp
+SYNOPSIS:
+    INT vexillaryp(OP perm,part)
+DESCRIPTION:
+ returns TRUE if perm is a vexillary permutation, i.e.
+        contains no subpermutation 2143. part becomes a partition useful
+        for special purposes, better method is to specify part=NULL.
+BUG:
+         perm must be VECTOR type. perm and part must be different.
+
+NAME:
+        zykeltyp
+SYNOPSIS:
+    INT zykeltyp(OP perm,part)
+DESCRIPTION:
+ computes the cyclestructure of the permutation perm, the
+	result is a PARTITION object part, perm and part may be equal.
+BUG: 
+        perm must be of VECTOR type.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a;
+	anfang();
+	a=callocobject();
+	scan(INTEGER,a); println(a);
+	random_permutation(a,a); println(a);
+	zykeltyp(a,a); println(a);
+
+	freeall(a);
+	ende(); 
+	}
+
+NAME:
+        UD_permutation
+SYNOPSIS:
+    INT UD_permutation(OP perm, vector)
+DESCRIPTION:
+ computes the up-down-sequence of a PERMUTATION
+	perm, the result is a VECTOR of 1 and 0, 1 for the +
+	and 0 for the -. 
+BUG:
+         works only for VECTOR representation perm and vector
+	must be different
+
+COMMENT:
+GENERAL ROUTINES
+----------------
+
+comp()
+copy()
+dec()                              decrease the self part
+einsp()                            test on identity
+even()				   test of membership in alternating group
+first()
+fprint()
+fprintln()
+inc()                              insert a fixpoint at the beginning
+invers()			   works only for VECTOR not ZYKEL
+last()
+lehmercode()
+length()			gives the degree of the permutation
+mult()				the multipliction is done as composition,
+				you can also multiply permutations of
+				different degree, but only permutations
+				of VECTOR type
+next()
+objectread()
+objectwrite()
+print()
+println()
+scan()				input, there is a test wether you
+			entered a permutation
+signum()
+sscan()			read from string
+tex()

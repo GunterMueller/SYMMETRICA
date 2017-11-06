@@ -1,0 +1,135 @@
+COMMENT:
+OBJECT
+
+The object is the only datatype of SYMMETRICA. It is a structure
+with two components. The first one is the kind, this is an
+information, which allows the system to decide how to handle
+the object. (e.g. there are different subroutines to add
+INTEGER objects or  POLYNOM objects) Using the kind-information
+the global routine add can switch to the correct subroutine.
+This information is of the datatype
+	OBJECTKIND
+which is defined in the file "def.h". There are several known
+kinds of objects. An incomplete list follows
+	EMPTY
+	INTEGER
+	VECTOR
+	PARTITION
+	PERMUTATION
+	LIST
+	POLYNOM
+	SCHUR
+	MATRIX
+	.
+	.
+	.
+The complete list is in the file "def.h", which defines these names.
+They are covered in the following chapters of this documentation.
+The header of the chapters are the names of the different values
+of the kind. The first step in a program of SYMMETRICA is the
+generation of an object. This object is always an empty object.
+This is done in the following program
+
+#include "def.h"
+#include "macro.h"
+main()
+{
+OP object;
+anfang();
+object = callocobject();               /* generation of an object */
+freeall(object);                       /* deletion of an object */
+ende();
+}
+
+Using the routine callocobject() you generate an empty object. This 
+object must have been declared using the type OP, which is also
+defined in "def.h". After all you have to delete the object, this is 
+done using the standard routine freeall(), which works for all
+objects, not only with empty objects. If you print an empty object
+you will get a "#", which is the symbol for the empty object. If you 
+change the above code into
+.
+.
+.
+object = callocobject();               /* generation of an object */
+println(object);
+freeall(object);                       /* deletion of an object */
+.
+.
+.
+you get the following line
+
+#
+
+To get the information about the kind of an object, you have the 
+routine s_o_k(), look at the following part of the pseudostandard
+routine print:
+.
+.
+INT print(a) OP a;
+.
+switch(s_o_k(a)) {
+	case INTEGER: return(print_integer(a));
+	.
+	}
+.
+.
+the complete description:
+
+NAME: 
+         s_o_k
+SYNOPSIS:    
+	  OBJECTKIND s_o_k(OP object)
+DESCRIPTION:
+   As OP is a pointer, there is first a check,
+	whether it is the NULL pointer, then it
+	returns the kind of the object
+RETURN: 
+       The returnvalue is the kind, or in the case of
+        an error the value (OBJECTKIND)ERROR. You have to cast
+	because in the normal case ERROR is of type INT.
+MACRO:
+         There is a macro S_O_K without a check
+
+COMMENT:
+To change the kind of an object, you have the routine c_o_k()
+
+NAME:  
+	        c_o_k
+SYNOPSIS:      
+	INT c_o_k(OP object; OBJECTKIND kind)
+DESCRIPTION: 
+	  As OP is a pointer, there is first a check,
+	whether it is the NULL pointer, then the
+	kind of the object is changed to kind
+RETURN:
+	        The returnvalue is OK, or ERROR if an error occured
+MACRO: 
+	        There is a macro C_O_K without a check
+
+COMMENT:
+The second part of an object, are the datas themself. The type is 
+defined in "def.h" as OBJECTSELF
+
+NAME:
+	s_o_s
+SYNOPSIS:
+	OBJECTSELF s_o_s(OP a)
+DESCRIPTION:
+	acess the self part of an object. This is a union 
+	of different datatypes according to the kind part
+	of the object
+MACRO:
+	S_O_S
+
+NAME:
+	c_o_s
+SYNOPSIS:
+	INT c_o_s(OP a, OBJECTSELF self)
+DESCRIPTION:
+	changes the self part of an object a. 
+MACRO:
+	C_O_S
+
+
+

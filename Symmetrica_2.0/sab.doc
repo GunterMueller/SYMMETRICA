@@ -1,0 +1,201 @@
+NAME:		
+	dimension_symmetrization
+SYNOPSIS:	
+	INT dimension_symmetrization(OP n,part,a)
+DESCRIPTION:    
+	computes the dimension of the degree of a irreducible
+	representation of the GL_n, n is a INTEGER object, labeled
+	by the PARTITION object a.
+RETURN:		
+	OK if no error occured.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c;
+	anfang();
+
+	a=callocobject(); b=callocobject(); c=callocobject();
+
+	printeingabe("Enter the degree of the linear group:");
+	scan(INTEGER,b);
+	printeingabe("Enter the part labeling the irrep of the linear group:");
+	scan(PARTITION,a);
+	printeingabe("The degree of the irrep is:");
+	dimension_symmetrization(b,a,c);
+	println(c);
+
+	freeall(a); freeall(b); freeall(c);
+	ende();
+	}
+
+
+NAME:
+	bdg
+SYNOPSIS:     
+	INT bdg(part,perm,D);  OP part,perm,D;
+
+DESCRIPTION:  
+	Calculates the irreduzible matrix representation 
+                        D^part(perm), whose entries are of integral numbers.
+          reference:    H. Boerner:
+                        Darstellungen von Gruppen, Springer 1955.
+                        pp. 104-107.
+
+NAME:
+	sdg
+
+SYNOPSIS:     
+	INT sdg(part,perm,D);  OP part,perm,D;
+
+DESCRIPTION:  
+	Calculates the irreduzible matrix representation 
+                        D^part(perm), which consists of rational numbers.
+          reference:    G. James/ A. Kerber:  
+                        Representation Theory of the Symmetric Group.
+                        Addison/Wesley 1981.
+                        pp. 124-126.
+
+NAME:
+	odg
+SYNOPSIS:     
+	INT odg(part,perm,D);  OP part,perm,D;
+
+DESCRIPTION:  
+	Calculates the irreduzible matrix representation 
+	D^part(perm), which consists of real numbers.
+
+  reference:    G. James/ A. Kerber:  
+		Representation Theory of the Symmetric Group.
+                        Addison/Wesley 1981.
+                        pp. 127-129.
+
+COMMENT:
+   4. Polynomial Representations of GLm(C):
+   ---------------------------------------
+   GENERAL HINT:
+
+        For the routines below are just for constructing small examples
+        and very time-and space-consuming, the user should take care
+        that his calculations do not exceed the following limits:
+
+        i)  Group size <= 1000.
+
+        ii) Matrix size (m^n) <= 256.
+
+        a)  Decomposition of the n-fold tensorproduct of the identical
+                representation of Glm(C) onto itself.
+
+NAME:	
+	glmndg
+SYNOPSIS:    
+	INT glmndg(m,n,M,VAR); OP m,n,M; INT VAR;
+
+DESCRIPTION: 
+	If VAR is equal to 0L the orthogonal representation 
+                         is used for the decomposition, otherwise, if VAR 
+                         equals 1L, the natural representation is considered.
+
+                         The result is the  VECTOR-Object M, consisting of  
+                         components of type MATRIX, representing the several 
+                         irreducible matrix representations of GLm(C) with 
+                         part_1' <= m, where part is a partition of n.
+
+COMMENT:
+        b)  Calculation of only one polynomial representation <<part>>
+                of GLm(C).
+
+NAME:
+	glpdg
+SYNOPSIS:     
+	INT glpdg(m,part,M); OP m,part,M;
+
+DESCRIPTION:  
+	part has to be an PARTITION object with not more
+                          than m parts.
+                          For this partition, the program calculates the
+                          polynomial irreducible representation
+                          <<part>> of GLm(C), which ist stored in the 
+                          MATRIX-Object M.
+
+            reference:    J. Grabmeier/ A. Kerber:  
+
+                          The evaluation of Irreducible Polynomial 
+                          Representations of the General Linear Groups 
+                          and of the Unitary Groups over Fields of 
+                          Characteristic 0.
+
+                          Acta Applicandae Mathematicae 8 (1987).
+
+                          (Describes a method different from
+                           the one implemented here, but gives a lot
+                           of theoratical background.)
+
+COMMENT:
+   5. Checking Homomorphy of Representations of GLm(C):
+   ------------------------------------------------
+NAME:
+	glm_homtest
+SYNOPSIS:     
+	INT glm_homtest(m,M); OP m,M;
+
+DESCRIPTION:  
+	The relation D(A)*D(B) = D(A*B) is verified 
+                        with two random integer matrices. 
+                        In case of M not being a representation, the 
+                        procedure displays an error message to stdout.
+
+COMMENT:
+/* Documentation  of routines, concerning the calculation of 
+   symmetry adapted bases for general finite permutation groups 
+
+   1. Calculating of a general symmetry adapted Basis:
+   --------------------------------------------------
+
+          SYNOPSIS:     sab_input(S,SMat,M);    OP S,SMat,M;
+                        group_gen(S,SMat,D,Di); OP S,SMat,D,Di;
+                        sab(Di,D,B,M,mpc);      OP Di,D,B,M,mpc;
+
+          The procedure sab_input reads the necessary input from the 
+          standard-input.
+
+          The input-format is as follows:
+
+                 --------------------------------------------------------------      
+                 nr of generators of  G             |       orderS 
+                 (INTEGER )                         |
+                                                    
+                 set S of generators of G           |       S 
+                 (VECTOR of PERMUTATIONS of         |
+                 length n, where G <= Sn)           |
+
+                 nr. of irred. representations      |       anz_irr
+                 (INTEGER )                         |
+
+                 matrices of irr.representations    |                           
+                 for the elements s in S            |       SMat
+                 (VECTOR of VECTOR of MATRIX)       |
+
+                 symmetric operator M               |       M 
+                 (MATRIX)                           |
+
+                 --------------------------------------------------------------      
+          With this input, group_gen calulates the whole symmetry group G.
+          The group elements are stored in D the first line of their 
+          irreducible matrix representations are stored in Di in the 
+          order of the invers elements. D has the same type as S and Di 
+          is a threedimensional VECTOR structure.
+
+          Finally sab can be called, which calculates the symmetry adapted
+          basis in B and the decomposed Operator in M as a vector of
+          matrices representing the blockdiagonal structure of M.
+          Every block occures once, its multiplicity ist stored in the
+          vector mpc.
+
+          REFERENCE:    E.Stiefel/A.Faessler:
+                        Gruppentheoretische Methoden und ihre Anwendung
+
+                        Teubner, 1979.
+*/

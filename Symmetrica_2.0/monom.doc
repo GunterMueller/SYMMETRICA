@@ -1,0 +1,64 @@
+COMMENT:
+MONOM
+
+
+MONOMobjects are special objects, which appear as entries of 
+LISTobjects, in the case when we want to build POLYNOMs,
+SCHURobjects or similiar things. It is a structure of two
+components, one component is the coefficent and the second one
+is an entry which labels one entry in the list, for example
+to build a POLYNOMobject, we have  as self part of the list
+a MONOMobject, whose self part is a VECTORobject of
+INTEGERobjects, the koeff part is arbitrary. 
+
+To access parts of the structure or two build a MONOMobject
+there are the following standard routines and macros.
+
+NAME       MACRO           DESCRIPTION
+--------------------------------------------------------
+c_mo_s     C_MO_S          change_monom_self
+c_mo_k     C_MO_K          change_monom_koeff
+s_mo_s     S_MO_S          select_monom_self
+s_mo_si    S_MO_SI         select_monom_self_ith_element
+s_mo_sii   S_MO_SII        select_monom_self_ith_element_as_INT
+s_mo_sl    S_MO_SL         select_monom_self_length
+s_mo_sli   S_MO_SLI        select_monom_self_length_as_INT
+s_mo_k     S_MO_K          select_monom_koeff
+s_mo_ki    S_MO_KI         select_monom_koeff_as_INT
+b_sk_mo
+m_sk_mo
+
+NAME:        
+	b_sk_mo
+SYNOPSIS:    
+	INT b_sk_mo(OP a,b,c)
+DESCRIPTION: 
+	builds a MONOMobject out of the self part a and
+       the koeff b. 'build' means that a and b become part
+       of the resulting object, there is no copy.
+       The result is the MONOMobject c. The return value is OK.
+
+NAME:  
+	      m_sk_mo
+SYNOPSIS: 
+	   INT m_sk_mo(OP a,b,c)
+DESCRIPTION:
+	 makes a MONOMobject out of the self part a and
+       the koeff b. 'make' means that a and b are copied
+       into the resulting object.
+       The result is the MONOMobject c. The return value is OK.
+
+
+COMMENT:
+	GENERAL ROUTINES
+	----------------
+	comp()
+	copy()
+	fprint()
+	fprintln()
+	objectread()
+	objectwrite()
+	print()
+	println()
+	scan()
+	tex()

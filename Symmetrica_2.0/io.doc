@@ -1,0 +1,297 @@
+COMMENT:
+IO-Functions
+------------
+
+NAME:  
+	     display
+SYNOPSIS: 
+	  INT display( OP a)
+DESCRIPTION:
+	 This is a old routine to provide  nice output of special 
+        objects. 
+RETURN:
+	     OK or ERROR
+BUGS:  
+	     It only works for SCHUBERT objects.
+
+
+NAME:  
+	     ferrers
+SYNOPSIS:
+	   INT ferrers( OP a)
+DESCRIPTION:
+	 prints the Ferrers diagramm of a PARTITION object to
+        stdout.
+RETURN:
+	     OK or ERROR
+BUGS:  
+	does not work with SKEWPARTITION object
+
+NAME:  
+	     fprint
+SYNOPSIS:
+	   INT fprint(FILE *fp, OP a)
+DESCRIPTION:
+	 prints the entered object a to the file pointed to by fp.
+        This works for the following kind of objects:
+
+	AUG_PART, BINTREE, BRUCH, GEN_CHAR, GRAPH, INTEGER,
+        HOM_SYM, PARTITION, GRAL, MONOPOLY, POLYNOM, SCHUBERT,
+        SCHUR, LIST, LONGINT, MATRIX, KOSTKA, KRANZTYPUS, MONOM, 
+        PERMUTATION, SKEWPARTITION, SYMCHAR TABLEAUX, COMP,
+        WORD, VECTOR, SQ_RADICAL, CYCLOTOMIC
+
+	If you print to stdout there is a global variable 
+        INT zeilenposition, which is updated to do line breaks after about
+        70 chars printed to stdout.
+RETURN:
+	     OK or ERROR
+BUGS:  
+	     Sometimes  the output is not easy to unterstand, there is no
+        difference between a VECTOR object with INTEGER objects and
+        a PERMUTATION object. 
+
+NAME:  
+	     fprintln
+SYNOPSIS: 
+	  INT fprintln(FILE *fp, OP a)
+DESCRIPTION: 
+	this does the same as fprint but with a trailing
+        newline.
+RETURN:
+	     OK 
+
+NAME:  
+	     objectread
+SYNOPSIS:
+	   INT objectread(FILE *fp, OP a)
+DESCRIPTION:
+	 reads an object  from the file fp, the object
+        will be in the variable a. The object must have 
+        been stored before by the routine objectwrite.
+	This works for the following types:
+	BRUCH, INTEGER, GRAL, HOM_SYM, SCHUR, MONOPOLY,
+        POLYNOM, SCHUBERT, LIST, LONGINT, MATRIX, MONOM,
+        SQ_RADICAL, CYCLOTOMIC, PARTITION, PERMUTATION, 
+        SYMCHAR, SKEWPARTITION, TABLEAUX, VECTOR, INTEGERVECTOR,
+	BITVECTOR
+	There is an error message in the case of fp == NULL.
+BUGS:  
+	     The format of storage is directly readable and because
+        of that very storage space consuming.
+        not yet implemented for all types
+
+NAME:  
+	     objectwrite
+SYNOPSIS:
+	   INT objectwrite(FILE *fp, OP a)
+DESCRIPTION:
+	 stores the object a in the file pointed by fp. In general
+        the format  codes first the type of the object and then it
+	stores the
+        parts of the object. Further information is in the doc files
+        for special objects. At the moment it works for the following
+        types:
+            BRUCH CYCLOTOMIC  GRAL HOM_SYM
+            INTEGER LIST LONGINT MATRIX MONOM MONOPOLY PARTITION
+            PERMUTATION POLYNOM SKEWPARTITION SCHUBERT SCHUR  SYMCHAR
+            SQ_RADICAL TABLEAUX VECTOR INTEGERVECTOR,
+	    BITVECTOR
+	There is an error message in the case of fp == NULL.
+BUGS:  
+	     not yet implemented for all types
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b;
+	FILE *fp1,*fp2;
+	anfang();
+
+	a=callocobject(); b=callocobject(); 
+	scan(scanobjectkind(),a);
+	
+	fp1=fopen("klo.dat","w"); objectwrite(fp1,a); fclose(fp1);
+	fp1=fopen("klo.dat","r"); objectread(fp1,b); fclose(fp1);
+	println(b);
+	freeall(a); freeall(b);
+	ende();
+	}
+
+NAME:	
+	sprint
+SYNOPSIS:
+	INT sprint(char *t; OP obj)
+DESCRIPTION:
+	prints an object on a string. It is up to the
+	user that the string is big enough to store the result.
+	At the moment it works for the following
+        types:
+		INTEGER, LONGINT
+BUGS:
+	not all types are implemented.
+
+NAME:  
+     print
+SYNOPSIS:
+   INT print(OP a)
+DESCRIPTION:
+ prints the object a to stdout. The position on stdout
+        is updated using a global variable 'INT zeilenposition'. At about
+	position 70 it prints a newline to stdout, and changes 
+	'zeilenposition' to 0. It calls the subroutine fprint, 
+	and works so for the same types.
+RETURN: 
+    OK if no error
+BUGS:
+   as in fprint
+
+NAME: 
+      printeingabe
+SYNOPSIS:
+   INT printeingabe(char *text)
+DESCRIPTION: 
+prints the entered text to stderr, this is under
+	normal circumstances the terminal of the user.
+	After the text it prints a newline.
+CHANGES:   
+ in former versions, it printed to stdout
+RETURN:
+     OK if no error
+BUGS:
+       there is no variable for the position of the cursor on
+        stderr, like for stdout.
+        
+
+NAME:      
+ println
+SYNOPSIS: 
+  INT println(OP a)
+DESCRIPTION:
+ prints the object a to stdout, at the end it prints
+        newline. (compare with print)
+BUGS:
+    as in print
+
+NAME: 
+      printobjectkind
+SYNOPSIS:
+   INT printobjectkind(OP a)
+DESCRIPTION: 
+print the kind of the object a. This is a routine, which must
+       	be changed for every new type of object.
+EXAMPLE:
+    ......
+            OP a = callocobject();
+            scan(INTEGER,a);
+	    printobjectkind(a);
+            ......
+            will print the information integer on the terminal
+
+NAME: 
+      scan
+SYNOPSIS:
+   INT scan(OBJECTKIND typ, OP result)
+DESCRIPTION: 
+reads an object of the specified kind into the
+	object result. The result is freed first to an 
+	empty object. You can read the following kinds
+             BRUCH CYCLOTOMIC FASTPOLYNOM 
+	     GEN_CHAR GRAL HOM_SYM INTEGER 
+             INTEGERVECTOR KOSTKA KRANZ 
+             KRANZTYPUS LIST LONGINT MATRIX MONOM MONOPOLY 
+             PARTITION PERMUTATION
+             POLYNOM SCHUBERT SCHUR SKEWPARTITION 
+             SQ_RADICAL SYMCHAR TABLEAUX VECTOR
+             WORD 
+        The kind INTEGERVECTOR is a special kind only provided as a 
+        type for input.
+        The output during scanning is written using the routine
+        printeingabe, so it prints to stderr, you may redirect
+        it (only on systems where it is possible).
+RETURN:
+     OK if no error
+	a value different from OK else.
+BUGS:   
+there is much output during scanning of an object.
+
+NAME:
+       sscan
+SYNOPSIS:
+   INT sscan(char *string, OBJECTKIND typ, OP result)
+DESCRIPTION: 
+reads an object of the specified kind into the
+	object result. The input is a string entered as the
+	first parameter. You can read the following kinds
+             INTEGER LONGINT PARTITION PERMUTATION
+		SCHUR
+RETURN:     
+OK if no error a value different from OK else.
+BUGS:
+   many types are missing
+EXAMPLE:
+	/* SYMMETRICA  */
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a;
+	anfang();
+	a = callocobject();
+	sscan("-1237878456777777", LONGINT, a);
+	println(a); freeall(a); ende();
+	}
+
+NAME:
+       scanobjectkind
+SYNOPSIS:
+   OBJECTKIND scanobjectkind()
+DESCRIPTION:
+ reads interactively the kind of an object
+RETURN:
+     the read kind of object
+CHANGES:
+ in version 1.1 it prints the text of the interaction to 
+         stdout, now it prints to stderr
+BUGS:
+       not all types are listed
+
+NAME: 
+      tex
+SYNOPSIS:
+   INT tex(OP a)
+DESCRIPTION:
+ gives an output in tex-readible form. It works for the 
+	following types of objects:
+             BRUCH CYCLOTOMIC GRAL INTEGER KOSTKA LIST LONGINT MATRIX 
+             MONOM MONOPOLY PARTITION PERMUTATION
+             POLYNOM SCHUBERT SCHUR SQ_RADICAL SYMCHAR TABLEAUX VECTOR
+         The position in the file of the texoutput is updated using
+         a global variable  INT texposition.
+CHANGES:   
+ in version 1.1 it prints the TeX-output to stdout, now 
+        in version 1.2+ it prints to texout, which is in the default 
+	case stdout, but may be changed by the user.
+BUGS:
+	does not work for all types
+ there are too many switches between math mode and no math mode.
+        LaTeX output would also be good.
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a;
+	anfang();
+	a=callocobject(); 
+	texout = fopen("klo","w");
+	scan(BRUCH,a);
+	tex(a);
+	freeall(a);
+	ende();
+	}
+	and the output will be written to the file klo. 
+

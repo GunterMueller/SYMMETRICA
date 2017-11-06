@@ -1,0 +1,467 @@
+COMMENT:
+		/* file: poly.doc SYMMETRICA documentation */
+		POLYNOM
+		-------
+
+		Polynomials are implemented as a LIST object of 
+		MONOM objects. Look also at the specific documentations.
+
+		This means, that you have a next part, which is the next part
+		of the list, it must be NULL if we are at the end of the list,
+		or it is again a POLYNOM object.
+		You have a self part, which is the self part of
+		the monom and you have a koeff part, which is the koeff part
+		of the monom. For a POLYNOM object it is necessary, that the
+		selfpart is a VECTOR object of INTEGER objects.
+
+		There is a set of routines which allows you to work directly 
+		with a POLYNOM object. These are
+
+		NAME              MACRO            DESCRIPTION
+		------------------------------------------------------------------
+		s_po_n            S_PO_N           select_polynom_next
+		s_po_s            S_PO_S           select_polynom_self
+		s_po_si           S_PO_SI          select_polynom_self_ith_element
+						   = s_v_i(s_po_s)
+		s_po_sii          S_PO_SII         select_polynom_self_ith_element_as_INT
+						   = s_v_ii(s_po_s)
+		s_po_sl           S_PO_SL          select_polynom_self_length
+						   = s_v_l(s_po_s)
+		s_po_sli          S_PO_SLI         select_polynom_self_length_as_INT
+						   = s_v_li(s_po_s)
+		s_po_k            S_PO_K           select_polynom_koeff
+		s_po_ki           S_PO_KI          select_polynom_koeff_as_INT
+						   = s_i_i(s_po_k)
+		m_skn_po                           make_self_koeff_next_polynom
+		b_skn_po                           build_self_koeff_next_polynom
+		b_s_po                             build_self_polynom
+		m_s_po                             make_self_polynom
+
+		EXAMPLE:
+			main()
+			{
+			OP a,b,c;
+			anfang();
+			a = callocobject();
+			b = callocobject();
+			c = callocobject();
+			m_il_v(2,a);m_i_i(1L,s_v_i(a,0L)); m_i_i(2L,s_v_i(a,1L));
+			m_i_i(7L,b);
+			b_skn_po(a,b,NULL,c);
+			println(c); /* output is the polynom 7ab^2 */
+			freeall(c);
+			ende();
+			}
+
+		As in the cases with other objects, if we use m_skn_po instead of
+		b_skn_po, we will work with copies of the self part next part and koeff
+		part. So we have to call freeall(b)  and freeall(c) at the end of 
+		the routine
+			main()
+			{
+			OP a,b,c;
+			anfang();
+			a = callocobject(); b = callocobject(); c = callocobject();
+			m_il_v(2,a);m_i_i(1L,s_v_i(a,0L)); m_i_i(2L,s_v_i(a,1L));
+			m_i_i(7L,b);
+			m_skn_po(a,b,NULL,c);
+			println(c); /* output is the polynom 7ab^2 */
+			freeall(a); freeall(b); freeall(c);
+			ende();
+			}
+
+		The routines b_s_po and m_s_po help to generate a POLYNOM object, where
+		the self-part is given by the self parameter and the coefficent is given
+		by the INTEGER object 1. The next part is NULL, which means we have
+		a POLYNOM object which consist only of one MONOM object.
+
+		!!!!!!!!!!! WARNING  this is new in V1.2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		If we use the standard routine init, we get an empty POLYNOM,
+		which means, that the self is the NULL pointer and the
+		next part is also NULL.
+		!!!!!!!!!!! WARNING  this is new in V1.2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+NAME:        
+	init_polynom
+SYNOPSIS:    
+	INT init_polynom(OP result)
+DESCRIPTION: 
+	the result becomes a POLYNOM object, which
+      is a LIST object, with NULL as next and NULL as self
+EXAMPLE:
+	But note that the example
+	main()
+	    { 
+		OP c;
+		anfang();
+		c =callocobject();
+		init(POLYNOM,c);
+		println(s_po_s(c));
+		freeall(c);
+		ende();
+	    }
+	produces an error, because the self part is not yet initialised.
+
+NAME:		
+	symmetrip_i
+SYNOPSIS:	
+	INT symmetricp_i(OP a; INT i)
+DESCRIPTION:	
+	checks wether a POLYNOM object a is symmetric in
+	i-th and (i+1)-th variable. The numbering of the variables
+	starts with 0. The return value is TRUE or FALSE.
+	An error occures if i<0 or a is no POLYNOM object.
+
+COMMENT:
+If you want to get a TEX-output of a polynom, the standard routine
+tex() calls the special routine tex_polynom() which numbers
+the variables of the POLYNOM object by a,b,c,...
+
+NAME:        
+	tex_polynom
+SYNOPSIS:    
+	INT tex_polynom(OP a)
+DESCRIPTION: 
+	Do a texoutput of the POLYNOM object, if the 
+      coefficient is not unity it calls tex() for the
+      coefficient, then it prints the variables named
+      a,b,c... In general you should use the standard
+      routine tex, not the speial one tex_polynom.
+
+
+COMMENT:
+A special kind of a POLYNOM are the socalled character polynomials and
+the Young polynomials:
+
+NAME:	     
+	character_polynom
+SYNOPSIS:    
+	INT character_polynom(OP part, res)
+DESCRIPTION: 
+	computes the character polynom labeled by the PARTITION object
+	part. The definition and method of computation is decribed in
+	Kerber: combinatorics via finite group actions p. 197
+	The result is a POLYNOM object res. If you enter the empty object
+	the result will be unity.
+
+NAME:	     
+	young_polynom
+SYNOPSIS:    
+	INT young_polynom(OP part,res)
+DESCRIPTION: 
+	computes the Young polynom labeled by the PARTITION object
+	part. The definition and method of computation is decribed in
+	Kerber: combinatorics via finite group actions p. 189
+	The result is a POLYNOM object res.
+
+COMMENT:
+These POLYNOM objects give value of characters of the symmetric group.
+To evaluate the polynomials, there is special kind of functions, which
+is faster then the standard routine eval_polynom:
+
+NAME:	     
+	eval_char_polynom
+SYNOPSIS:    
+	INT eval_char_polynom(OP pol,vec,res)
+DESCRIPTION: 
+	you enter a POLYNOM object pol, which should be a Young polynomial
+	or a character polynomial enter a VECTOR object vec, which should be
+	a cycle type, and the result, which is a character will be in the object
+	res.
+
+
+COMMENT:
+One useful value is the degree of a single-variable
+polynomial
+
+NAME:        
+	degree_polynom
+SYNOPSIS:    
+	INT degree_polynom(OP a,b)
+DESCRIPTION:
+
+
+COMMENT:
+The evaluation of a POLYNOM at a given value of the variables:
+ 
+NAME:        
+	eval_polynom
+SYNOPSIS:    
+	INT eval_polynom(OP a,b,c)
+DESCRIPTION: 
+	you enter a POLYNOM object a, and an VECTOR object
+      b, where the ith entry of the VECTOR object b gives
+      the value for the specialization of the i-th variable. If the
+      i-th entry is an empty object, you don't specialize
+      the i-th variable. The output will be in c.
+
+NAME:        
+	gauss_polynom
+SYNOPSIS:    
+	INT gauss_polynom(a,b,c)
+DESCRIPTION:  
+	computing Gauss polynomial using recursion.
+
+NAME:        
+	gauss_schubert_polynom
+SYNOPSIS:    
+	INT gauss_polynom(a,b,c)
+DESCRIPTION:  
+	computing Gauss polynomial as a specialisation 
+	of  Schubert polynomials (slower)
+
+
+NAME:		
+	is_scalar_polynom
+SYNOPSIS:	
+	INT is_scalar_polynom(OP a)
+DESCRIPTION:	
+	returns TRUE if the object a is a POLYNOM object,
+	with only a constant term. Else the return value is FALSE.
+
+
+COMMENT:
+It is a well known fact, that for n given values at n given points,
+there is exactly one
+polynomial in one variable of degree n-1 with these 
+values at these points, it is the so called Lagrange polynomial.
+
+NAME:        
+	lagrange_polynom
+SYNOPSIS:    
+	INT lagrange_polynom(OP a,b,c) 
+DESCRIPTION: 
+	This routine computes the Lagrange polynomial which 
+      interpolates at the points in the VECTOR object a (which
+      must be pairwise different), with the values in the VECTOR
+      object b, which must be as long as a, the result is a 
+      POLYNOM object c, in one variable.
+
+EXAMPLE:
+
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c;
+	anfang();
+
+	a=callocobject(); b=callocobject(); c=callocobject(); 
+	m_il_v(2L,a);
+	m_i_i(1L, s_v_i(a,0L));
+	m_i_i(7L, s_v_i(a,1L));
+
+	m_il_v(2L,b);
+	m_i_i(5L, s_v_i(b,0L));
+	m_i_i(7L, s_v_i(b,1L));
+
+	lagrange_polynom(a,b,c);println(c);
+	freeall(a); freeall(b); freeall(c); 
+	ende();
+	}
+
+
+COMMENT:
+To build monomials in an easy way we have the routine
+m_iindex_monom, which  allows to build polynomials like
+a + b + c .. .
+
+NAME:        
+	m_iindex_monom
+SYNOPSIS:    
+	INT m_iindex_monom(INT i; OP erg)
+DESCRIPTION: 
+	builds a POLYNOM object consisting of a single monomial
+     which is the i-th variable. At first it frees the result to an 
+     empty object. There is a check whether i is >= 0.
+RETURN:      
+	ERROR if an error occures, OK else.
+
+EXAMPLE:
+
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b;
+	INT i;
+	anfang();
+	a=callocobject(); b=callocobject(); 
+	for (i=0L; i<= 10L; i++) 
+		{ m_iindex_monom(i,b); add(b,a,a); }
+	mult(a,a,b); println(b);
+	freeall(a); freeall(b);
+	ende();
+
+COMMENT:
+This routine is a special case of the following, which allows 
+you to generate the polynomial a_i ^ex 
+
+NAME:        
+	m_iindex_iexponent_monom    
+SYNOPSIS:    
+	INT m_iindex_iexponent_monom(INT i,ex; OP erg)
+DESCRIPTION: 
+	builds a POLYNOM object consisting of a single monomial
+     which is the i-th variable, and the exponent of this variable
+     is given by ex. First it frees the result to an 
+     empty object. There is a check whether i is >= 0.
+RETURN:      
+	ERROR if an error occures, OK else.
+
+NAME:        
+	m_scalar_polynom    
+SYNOPSIS:    
+	INT m_scalar_polynom(OP a,b)
+DESCRIPTION: 
+	a is a scalar object, b becomes the result, again
+     a POLYNOM object. a becomes the coefficent of the POLYNOM object
+     with one single monomial, namely the monomial [0], i.e. a single variable,
+     whose exponent is zero.
+
+NAME:		
+	m_vec_vec_polynom
+SYNOPSIS:	
+	INT m_vec_vec_polynom(OP a,b,c)
+DESCRIPTION:	
+	a nd b are VECTOR objects of the same length, whose
+	entries are positive INTEGER objects. The output is a POLYNOM object
+	with coeff 1, consisting of the singe monom 
+	c = product over a_i ^ b_i
+RETURN:		
+	OK or ERROR
+
+NAME:        
+	mult_disjunkt_polynom_polynom    
+SYNOPSIS:    
+	INT mult_disjunkt_polynom_polynom(OP a,b,c)
+DESCRIPTION: 
+	a and b are POLYNOM objects and c becomes the result of the
+     multiplication of a and b, where the alphabets of the two POLYNOM objects
+     are taken different
+
+EXAMPLE: 
+	Read a POLYNOM and multiply it with itself, assumming the two
+         alphabets to be different
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP b,d;
+	anfang();
+	b=callocobject(); 
+	d=callocobject(); 
+	scan(POLYNOM,b);
+	mult_disjunkt_polynom_polynom(b,b,d);
+	println(d);
+	freeall(b); freeall(d);
+	ende();
+	}
+
+NAME:	     
+	numberofvariables
+SYNOPSIS:    
+	INT  numberofvariables(OP pol,res)
+DESCRIPTION: 
+	computes the number of variables of the POLYNOM object pol.
+	The result is a positiv INTEGER object res. If the self-part of
+	pol is NULL, the result is zero.
+BUG:	     
+	if you have for example the POLYNOM  x_0 x_3
+	the result will be four, because the routines looks on the 
+	index of the highest exponent not equal to zero.
+			
+
+NAME:        
+	polya_sub    
+SYNOPSIS:    
+	INT polya_sub(OP a,c,b)
+DESCRIPTION: 
+	a is a POLYNOM object, b becomes the result, again
+     a POLYNOM object, c is a INTEGER object, which gives the
+     number of different variables in a. There is the
+     substitution x_i becomes 1 + q^i, so the result is a
+     POLYNOM object in one variable.
+
+EXAMPLE: 
+	Computes the Polya substitution in a Schur polynomial.
+
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c,d;
+	anfang();
+
+	a=callocobject(); b=callocobject(); 
+	c=callocobject(); d=callocobject(); 
+
+	scan(PARTITION,a);println(a);
+	scan(INTEGER,b);println(b);
+	compute_schur_with_alphabet(a,b,c);println(c);
+	polya_sub(c,b,d); println(d);
+
+	freeall(a); freeall(b); freeall(c); freeall(d); 
+	ende();
+	}
+
+NAME:		
+	select_coeff_polynom
+SYNOPSIS:	
+	INT select_coeff_polynom(OP a,b,c)
+DESCRIPTION:	
+	you enter a POLYNOM object a, and an VECTOR object b, which must
+	have INTEGER entries, this integer vector is treated as an exponent vector,
+	the output is the coefficent which is the object c. This is a copy
+	of the coefficent in the polynom. 
+
+COMMENT:
+			t_POLYNOM_SCHUBERT		see sb.doc
+			t_POLYNOM_MONOMIAL		see sr.doc
+
+NAME:        	
+	test_poly    
+SYNOPSIS:    	
+	INT test_poly()
+DESCRIPTION: 	
+	checks the installation of  the POLYNOM routines.
+
+NAME:        	
+	unimodalp    
+SYNOPSIS:    	
+	INT unimodalp(OP a)
+DESCRIPTION: 	
+	tests unimodality of a POLYNOM object
+RETURN:      	
+	TRUE or FALSE
+
+
+
+COMMENT:
+GENERAL ROUTINES
+----------------
+add()
+add_apply()
+addinvers()
+addinvers_apply()
+comp()
+copy()
+einsp()
+fprint()
+fprintln()
+freeall()
+freeself();
+hoch()
+mult()
+mult_apply()
+nullp()
+objectread()
+objectwrite()
+print()
+println()
+scan()			input as a sum of monomial
+tex()

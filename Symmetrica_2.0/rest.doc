@@ -1,0 +1,279 @@
+COMMENT:
+GENERAL routines
+----------------
+
+NAME:         
+	append
+SYNOPSIS:     
+	INT append(OP a,b,c)
+DESCRIPTION:  
+	appends the object b on the object a giving
+        object c.  The variables a,b,c may be equal.
+	It works for the following kind of
+        objects:
+	INTEGER
+        VECTOR
+	if the objects a or b are INTEGER objects they where 
+        transformed into VECTOR objects.
+	PARTITION: this is a merge of the parts
+
+NAME:         
+	comp
+SYNOPSIS:     
+	INT comp(OP a,b)
+DESCRIPTION:  
+	compares the two objects, giving 0L if
+        equal, <0 if a smaller , >0 if a bigger.
+	it works for the following kind of objects
+        BRUCH       numerical
+        INTEGER     numerical
+        LIST        lexico
+        LONGINT     numerical
+        MATRIX      lexico
+        PARTITION   lexico        
+        PERMUTATION lexico        
+        POLYNOM     lexico        
+	REIHE       lexico
+        SCHUBERT    lexico       
+        SCHUR       lexico      
+	VECTOR      lexico
+        
+
+NAME:         
+	copy
+SYNOPSIS:     
+	INT copy(OP a,b)
+DESCRIPTION:  
+	copies object a to b. First b is freed to an empty
+        object.
+
+NAME:		
+	divdiff
+SYNOPSIS:	
+	INT divdiff(OP a,b,c)
+DESCRIPTION:	
+	computes the divided difference. The Operator is labeld
+	by the object a (PERMUTATION or INTEGER) and is apllied on the
+	object b (POLYNOM or SCHUBERT) the result is the object c.
+
+NAME:         
+	dynamicp
+SYNOPSIS:     
+	INT dynamicp(OP a)
+DESCRIPTION:  
+	tests whether a is a dynamic datatype.
+RETURN:       
+	TRUE or FALSE
+
+NAME:         
+	einsp
+SYNOPSIS:     
+	INT einsp(OP a)
+DESCRIPTION:  
+	tests whether a is unity. works for the following 
+        kinds of objects:
+        BRUCH   FINITEFIELD
+        INTEGER
+        LONGINT	MATRIX
+        PERMUTATION
+	REIHE
+	SCHUBERT
+	SYMCHAR
+	VECTOR
+RETURN:       
+	TRUE or FALSE
+
+NAME:         
+	even
+SYNOPSIS:     
+	INT even(OP a)
+DESCRIPTION:  
+	checks wether the input is even, this works for the
+	following kind of objects
+	INTEGER	
+	LONGINT
+	PERMUTATION
+EXAMPLE:	
+	the following is an example for a PERMUTATION object as
+	the input:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a;
+	anfang();
+
+	a=callocobject(); scan(PERMUTATION,a); print(a);
+	if (even(a))
+		{printf(" is element of A");println(S_P_L(a));}
+	else
+		{printf(" is not element of A");println(S_P_L(a));}
+	freeall(a); ende();
+	}
+
+NAME:         
+	first
+SYNOPSIS:     
+	INT first(OBJECTKIND k; OP a, erg)
+DESCRIPTION: 
+	 k gives the kind of object, which we want to generate
+        a is a parameter which is needed to generate erg becomes
+        the result
+
+NAME:  
+	       freeall
+SYNOPSIS:
+	     INT freeall(OP a)
+DESCRIPTION:
+	frees all the memory of object a, before further use of a, you
+	have to do a=callobject();
+
+NAME:      
+	   freeself
+SYNOPSIS: 
+	    INT freeself(OP a)
+DESCRIPTION:
+		frees the memory of the object a, the result is a empty object a
+
+NAME:         
+	init
+SYNOPSIS:
+	     INT init(OBJECTKIND a, OP b)
+DESCRIPTION:
+	  it generates an empty  object of the special kind,
+        specified by a. First it frees b to an empty object. Now
+	follows the exact specification of the meaning empty
+        object of the special kind:
+	INTEGER:     empty object
+        VECTOR:      vector of length 0 with self==NULL
+        LIST:        self and next == NULL
+        MONOM:       self and koeff are empty objects
+        POLYNOM:   
+        SCHUR:
+        SCHUBERT:    next==NULL self == empty MONOM
+        PERMUTATION: self is empty object
+        PARTITION:   self is empty object
+   
+NAME:  
+	       insert
+SYNOPSIS:
+	     INT insert(OP a,b; INT (*eq)(), (*comp)())
+DESCRIPTION:
+	  inserts the object a into the object b, the funktion
+        comp is for comparision of the list elements, these are for
+        example MONOM objects in the case of POLYNOM objects, the
+        function eq is for handling the case, that the element
+        which should be inserted is already in the list.
+        (comp the file list.doc)
+
+NAME:  
+	       lastof
+SYNOPSIS:
+	     INT lastof(OP a,b)
+DESCRIPTION:
+	  b becomes the last element of a. It works for
+        PARTITION
+        SKEWPARTITION
+        VECTOR
+        it should be noticed, that b becomes a copy of the 
+        last element.
+
+NAME:  
+	       lastp
+SYNOPSIS:
+	     INT lastp(OP a)
+DESCRIPTION:
+	  
+RETURN:
+	       TRUE or FALSE
+
+NAME:  
+	       listp
+SYNOPSIS:
+	     INT listp(OP a)
+DESCRIPTION:
+	  
+RETURN:
+	       TRUE or FALSE
+
+NAME:  
+	       negeinsp
+SYNOPSIS:
+	     INT negeinsp(OP a)
+DESCRIPTION:
+	  
+RETURN:
+	       TRUE or FALSE
+
+NAME:  
+	       negp
+SYNOPSIS:
+	     INT negp(OP a)
+DESCRIPTION:
+	  
+RETURN: 
+	      TRUE or FALSE
+
+NAME:  
+	       next
+SYNOPSIS:
+	     INT next(OP a,b)
+DESCRIPTION:
+	  computes the next element, at the moment it works
+      for: PARTITION PERMUTATION
+RETURN:
+	       TRUE or FALSE accord whether there was a next element
+      or not
+
+NAME:  
+	       nullp
+SYNOPSIS: 
+	    INT nullp(OP a)
+DESCRIPTION:
+	  	returns true if the object a is null, it works
+	for INTEGER,FINITEFIELD, LONGINT,BRUCH,POLYNOM,
+	VECTOR,SQRAD,CYCLOTOMIC,SYMCHAR,
+	MATRIX, SCHUBERT, REIHE
+RETURN:
+	       TRUE or FALSE
+
+NAME:  
+	       posp
+SYNOPSIS:
+	     INT posp(OP a)
+DESCRIPTION:
+	  
+RETURN:
+	       TRUE or FALSE
+
+NAME:  
+	       rz
+SYNOPSIS:
+	     INT rz(OP a,b)
+DESCRIPTION:
+	  computes a reduced decomposition of a PERMUTATION object
+      a, or of VECTOR object a, which needs to be a lehmercode
+      (cf. perm.doc), the result is VECTOR object b of INTEGER objects.
+	This works for permutations i.e. weyl group type A, and for
+	barred permutations, i.e. weyl group type B.
+RETURN:
+	       OK or ERROR
+
+NAME:  
+	       scalarp
+SYNOPSIS: 
+	    INT scalarp(OP a)
+DESCRIPTION:
+	  BRUCH, INTEGER or LONGINT are socalled scalar types, in this
+	case the return value is true.
+RETURN:
+	       TRUE or FALSE
+
+NAME:  
+	       swap
+SYNOPSIS:
+     INT swap(OP a,b)
+DESCRIPTION:
+  the values of the objects a and b are exchanged
+RETURN:	
+	ERROR if a == b or OK

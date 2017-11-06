@@ -1,0 +1,832 @@
+COMMENT:
+	PARTITION
+
+	Partitions are implemented as a structure of two components, this 
+	is done analogously to the implementation of objects. The first 
+	component, the kind, tells how they are coded, and the second part,
+	the self-part, is an object, which implements the partition.
+	At the moment there are two different implementations of partitions,
+	the first method, means that
+		kind ==  VECTOR 
+	and the self part is a VECTOR object of INTEGER objects, which are
+	the parts of the partition, the second method has
+		kind == EXPONENT
+	and the self part is again a VECTOR object of INTEGER objects, which 
+	are now the multiplicities of the parts.  Most
+	routines work with the first kind (=VECTOR). So for
+	example scan().
+	There are two routines to change between the two different 
+	methodes of representing the partitions.
+
+NAME:
+             t_VECTOR_EXPONENT
+SYNOPSIS:
+         INT t_VECTOR_EXPONENT(OP a,b)
+DESCRIPTION:
+      transforms a PARTITION object a, where kind of a is
+	VECTOR, into a PARTITION object b, where kind is EXPONENT, a and 
+	b may be equal. b is freed first to an empty object.
+	if a is an empty object b becomes a vector of length 1 with 
+	the entry zero
+RETURN:
+           is OK
+
+NAME:
+             t_EXPONENT_VECTOR
+SYNOPSIS:
+         INT t_EXPONENT_VECTOR(OP a,b)
+DESCRIPTION:
+      transforms a PARTITION object a, where kind of a is
+	EXPONENT, into a PARTITION object b, where kind is VECTOR, a and 
+	b may be equal. b is freed first to an empty object.
+RETURN:
+           is OK
+
+COMMENT:
+	Obey the following rule:
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if the partition is of kind VECTOR, the elements are increasing
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+	There is now a new third method for representation of a partition,
+	it is kind == FROBENIUS, the self part is a VECTOR of length two
+	whose two components are again VECTOR objects, which are the two
+	vectors of the Frobenius notation. There is one routine to
+	change notation
+
+NAME:	
+	t_VECTOR_FROB
+SYNOPSIS:
+	INT t_VECTOR_FROB(OP a,b)
+DESCRIPTION:
+	computes for a PARTITION object a, which is in
+	VECTOR notation, the 
+	same PARTITION object in FROBENIUS notation, which 
+	becomes the object b.
+
+EXAMPLE:
+	To construct a partition out of a VECTOR object, you have to 
+	provide the VECTOR object, and you have to specify the specific
+	kind, look at the following example
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP v,p;
+	anfang();
+	v = callocobject(); p = callocobject();
+	m_il_v(2L,v); 
+	m_i_i(1L,s_v_i(v,0L));
+	m_i_i(2L,s_v_i(v,1L));
+	b_ks_pa(VECTOR,v,p); println(p);
+	freeall(p);
+	/* dont free v, because it is part of p */
+	ende();
+	}
+
+COMMENT:
+	Here is the complete description of b_ks_pa() and the second 
+	constructor m_ks_pa().
+
+NAME:             
+	b_ks_pa 
+SYNOPSIS:         
+	INT b_ks_pa(OBJECTKIND kind;OP self, result)
+DESCRIPTION:
+	      this routine build out of the two components kind
+	and self of a PARTITION object a new PARTITION object result.
+	self becomes part of the result.
+	First they free the result to an empty object. There is no check
+	whether kind and self are meaningful.
+	There may be an error in the 
+	allocation, of the memory of the PARTITION object.
+RETURN:
+           OK or ERROR
+
+
+
+NAME:             
+                  m_ks_pa    
+SYNOPSIS:         
+                  INT m_ks_pa(OBJECTKIND kind;OP self, result)
+DESCRIPTION:
+	      this routines build out of the two components kind
+	and self of a PARTITION object a new PARTITION object result.
+	First they free the result to an empty object. There is no check
+	whether kind and self are meaningful. The self part will be a
+	copy of the second parameter. This is the difference from b_ks_pa.
+	There may be an error in the 
+	allocation, of the memory of the PARTITION object.
+RETURN:
+           OK or ERROR
+
+
+COMMENT:
+There is also the standard routines for the selection of the two parts of 
+a PARTITION object, they are named s_pa_s, which gives you the self-part
+and the routine s_pa_k, which gives you the kind of the representation.
+The complete descriptions
+
+NAME:             
+	s_pa_s       
+SYNOPSIS:         
+	OP s_pa_s(OP partition)
+DESCRIPTION:      
+	selects the self-part, which should  be an 
+	VECTOR object
+	(up to now), there is first a check whether partition is really
+	a PARTITION object, else we would get an error.
+RETURN:
+	           the self part, or NULL if an error occured
+MACRO: 
+	           there is also a macro S_PA_S, without a check
+
+NAME:      
+	       s_pa_k 
+SYNOPSIS:        
+	 OBJECTKIND s_pa_k(OP partition)
+DESCRIPTION: 
+     selects the kind-part, which should  be 
+	VECTOR or EXPONENT
+	(up to now), there is first a check whether partition is really
+	a PARTITION object, else we would get an error.
+RETURN:
+	           the kind part, or (OBJECTKIND)ERROR if an error 
+	occured
+MACRO: 
+	           there is also a macro S_PA_K, without a check
+
+COMMENT:
+	As we have seen, there always (up to now) VECTOR objects as self-parts
+	of a PARTITION object, we can access the i-th entry, and also the
+	length of PARTITION object, this can be done using the 
+	following routines
+
+
+	NAME              DESCRIPTION            MACRO
+
+	s_pa_l            s_v_l(s_pa_s)          S_PA_L
+	s_pa_li           s_v_li(s_pa_s)         S_PA_LI
+	s_pa_i            s_v_i(s_pa_s)          S_PA_I
+	s_pa_ii           s_v_ii(s_pa_s)         S_PA_II
+
+	But you shouldn't use this routines, if you have implemented an
+	own type of partition, which has no VECTOR object as the self-part.
+	This have been the basic routines for PARTITION objects.
+
+NAME:	
+		partitionp
+SYNOPSIS:
+		INT partitionp(OP part)
+DESCRIPTION:
+		it checks whether the object part is a PARTITION object
+	and it checks whether the INTEGER objects in the self part are in
+	increasing order (only in the case of VECTOR type)
+RETURN:
+			TRUE or FALSE
+
+COMMENT:
+	To test wether we have a PARTITION of rectangle shape
+
+NAME:   
+	      rectanglep
+SYNOPSIS:
+	     INT rectanglep(OP part)
+DESCRIPTION:
+	  returns TRUE if of rectangle shape FALSE in the
+      else case. Works for VECTOR type and EXPONENT type.
+
+COMMENT:
+To test wether we have a PARTITION with only different parts
+
+NAME:  
+	       strictp
+SYNOPSIS:
+	     INT strictp(OP part)
+DESCRIPTION:
+	  returns TRUE or FALSE.
+      Works for VECTOR type and EXPONENT type.
+
+NAME:
+			strict_to_odd_part
+SYNOPSIS:
+		INT strict_to_odd_part(OP s,o)
+DESCRIPTION:
+		implements the bijection between strict partitions
+	and partitions with odd parts. input is a VECTOR type partition, the
+	result is a partition of the same weight with only odd parts.
+
+NAME:
+			odd_to_strict_part
+SYNOPSIS:	
+	INT odd_to_strict_part(OP s,o)
+DESCRIPTION:
+		implements the bijection between partitions with odd parts
+	and strict partitions. input is a VECTOR type partition, the
+	result is a partition of the same weight with different parts.
+
+COMMENT:
+There is a test wether the PARTITION object has equal parts
+
+NAME:
+			equal_parts
+SYNOPSIS:
+		INT equal_parts(OP part, OP number)
+DESCRIPTION:
+		returns TRUE if the PARTITION object part has
+	>= number equal parts. This routine is needed for
+	modular representations of the symmetric group.
+BUG:
+			works  only for VECTOR type partitions
+
+NAME:
+			q_core
+SYNOPSIS:
+		INT q_core(OP part, d, res)
+DESCRIPTION:
+		computes the q-core of a PARTITION object
+	part. This is the remaining partition (=res) after
+	removing of all hooks of length d (= INTEGER object).
+	The result may be an empty object, if the whole
+	partition disappears.
+BUG:
+			works  only for VECTOR type partitions
+
+
+
+COMMENT:
+	Sometimes it is useful to sort an INTEGER vector, so that the
+	result is a PARTITION object. This is done in the routine m_v_pa.
+
+NAME:   
+	      m_v_pa
+SYNOPSIS:     
+	INT m_v_pa(OP vec, result)
+DESCRIPTION:
+	  The vec must be a VECTOR object with positve (>=0)
+      INTEGER objects. This vector will be sorted and becomes the
+      self part of the result which becomes a PARTITION object.
+      As the name make_ ..    says the vec will be copied. So you
+      can still use the unsorted INTEGER vector vec. In the case
+      b_v_pa the sorted vector becomes part of the PARTITION 
+      result.
+      in the case of m_v_pa vec and result may be equal
+RETURN:       
+      ERROR if negative entries
+      ERROR if not INTEGER entries
+      OK
+
+COMMENT:
+If you want to build a PARTITION with only one part, you have
+m_i_pa. 
+
+NAME:       
+	  m_i_pa 
+SYNOPSIS:     
+	INT m_i_pa(OP int, result)
+DESCRIPTION:
+	  build a PARTITION object with one part, namely the
+     INTEGER object int. There is a copy of int inside the partition.
+
+COMMENT:
+Advanced routines
+-----------------
+
+Generation of partitions:
+Very often you want to loop over all partitions, of a given 
+weight. Look:
+
+#include "def.h"
+#include "macro.h"
+main()
+{
+OP a,b;
+anfang();
+a = callocobject();
+b = callocobject();
+scan(INTEGER,a);
+first_partition(a,b);
+do {
+println(b);
+} while (next(b,b));
+freeall(a);
+freeall(b);
+ende();
+}
+
+which is a program which first asks the weight, and then
+prints a list of all partitions of that weight. Now the description:
+
+NAME:           
+	first_partition
+SYNOPSIS:       
+	INT first_partition(OP n, result)
+DESCRIPTION:    
+	n must be an INTEGER object, and result becomes the 
+	PARTITION object of VECTOR kind, which is the first one 
+	according to many orders of partitions, namely the partition
+	[n]. 
+EXAMPLE:
+	to loop over all partitions
+
+	#include "def.h"
+	#include "macro.h"
+	ANFANG
+	scan(INTEGER,a);
+	first_partition(a,b);
+	do {
+	println(b);
+	} while (next(b,b));
+	ENDE
+
+COMMENT:
+analogous there is
+
+NAME:      
+	     last_partition
+SYNOPSIS:       
+	INT last_partition(OP n, result)
+DESCRIPTION:  
+	  n must be an INTEGER object, and result becomes the 
+	PARTITION object of VECTORkind, which is the last one 
+	according to many orders of partitions, namely the partition
+	[1,1,1,....,1,1]. n and result may be equal objects.
+
+NAME:
+	next_partition
+SYNOPSIS:
+	next_partition(OP partone, OP partnext)
+DESCRIPTION:
+	using the algorithm of Nijnhuis/Wilf the next partition with
+	the same weight is computed. Better to use the general routine
+	next(OP,OP)
+EXAMPLE:
+	to loop over all partitions
+
+	#include "def.h"
+	#include "macro.h"
+	ANFANG
+	scan(INTEGER,a);
+	first_partition(a,b);
+	do {
+	println(b);
+	} while (next(b,b));
+	ENDE
+
+
+
+
+COMMENT:
+If you want to specify the kind of representation of the 
+partition, there is also
+
+NAME:
+	first_part_VECTOR
+SYNOPSIS:
+	INT first_part_VECTOR(OP n, OP res)
+NAME:
+	first_part_EXPONENT
+SYNOPSIS:
+	INT first_part_EXPONENT(OP n, OP res)
+NAME:
+	last_part_VECTOR
+SYNOPSIS:
+	INT last_part_VECTOR(OP n, OP res)
+NAME:
+	last_part_EXPONENT
+SYNOPSIS:
+	INT last_part_EXPONENT(OP n, OP res)
+
+COMMENT:
+which have the same parameters and produce the specified 
+PARTITION objects. To generate the next partition you 
+should use the standardroutine next(), which allows
+you to use the same object for input and output, which is
+not allowed if you use the low level routine next_partition().
+
+For the output of a PARTITION object using the standard
+routines print println or fprint and fprintln, you have to
+know the followiing convention. The parts of size 10 <= .. <=15
+are printed as A,B,C,D,E,F and the parts bigger than 15
+are printed with | between the parts. 
+
+
+
+NAME:           
+	makevectorofpart      gives a vector of partitions
+SYNOPSIS:       
+	INT makevectorofpart(OP n, result)
+DESCRIPTION:    
+	n must be an INTEGER object, and result becomes a 
+	VECTOR object of PARTITION objects. The order is according
+	to the order of next(). [Nijenhuis/Wilf]
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b;
+	anfang();
+	a = callocobject();
+	b = callocobject();
+
+	scan(INTEGER,a);
+	makevectorofpart(a,b);
+	println(b);
+	println(s_v_i(b,s_v_li(b)-1L));
+
+	freeall(a);
+	freeall(b);
+	ende();
+	}
+
+
+
+
+NAME:        
+	numberofpart       number of partitions
+SYNOPSIS:    
+	INT numberofpart(OP n, result)
+DESCRIPTION: 
+	numberofpart computes the number of partitions of the
+	given weight n, which must be an INTEGER object. The result
+	is an INTEGER object, or a LONGINTobject, according to the
+	size of n. 
+RETURN:     
+	OK or ERROR.
+EXAMPLE:
+	This programm prints the number of partitions of weight up to 199.
+	As you know this is big number, and the result for e.g. a=150
+	 will be no longer
+	an INTEGER object as for a=10, but a LONGINTobject. 
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	INT i;
+	OP a,b;
+	anfang();
+	a = callocobject();
+	b = callocobject();
+
+	for (i=1L;i<200L;i++)
+		{
+		freeself(a); freeself(b); /* a,b are now empty objects */
+		M_I_I(i,a);
+		numberofpart(a,b);
+		/* b is the number of partitions of weight a */
+		print (a) ; println(b);
+		}
+
+	freeall(a);
+	freeall(b);
+	ende();
+	}
+
+NAME:        
+             numberofpart_i 
+SYNOPSIS:    
+             INT numberofpart_i(OP n)
+DESCRIPTION: 
+	numberofpart_i computes the number of partitions of the
+	given weight n. the result will be the rturn value, so it works only for a 
+	small input.
+RETURN:     
+	 numberofpart_i returns the number of partitions or
+	ERROR
+
+COMMENT:
+This routine uses a method, which was described by Gupta,
+which is recursive one. So we have the following routine
+
+NAME:        
+	gupta_nm
+SYNOPSIS:    
+	INT gupta_nm(OP n,m,erg)
+DESCRIPTION: 
+	this routine computes the number of partitions
+        of n with maximal part m. The result is erg. The
+        input n,m must be INTEGER objects. The result is
+        freed first to an empty object. The result must
+        be a different from m and n.
+RETURN:
+	      OK
+
+COMMENT:
+There is also a routine, which computes a table of this
+values:
+
+NAME:  
+	      gupta_tafel
+SYNOPSIS:
+	    INT gupta_tafel(OP max, result)
+DESCRIPTION: 
+	it computes the table of the above values. The entry
+        n,m is the result of gupta_nm. mat is freed first. 
+        max must be an INTEGER object, it is the maximum 
+        weight for the partitions. max must be different from
+        result.
+RETURN:
+	      OK
+
+COMMENT:
+Very often we have to work with vectors or matrices labeled by
+partitions. So we need the index of a partition:
+
+NAME:  
+	       indexofpart
+SYNOPSIS:
+	     INT indexofpart(OP part)
+DESCRIPTION:
+	  computes the index of a partition. The algorithm used
+       is the same as in next_partition. So the partition given
+       by first_partition has the index 0. 
+RETURN:
+	       The index of the partition, or ERROR
+
+
+NAME:
+			random_partition
+SYNOPSIS:
+		INT random_partition (OP w, p)
+DESCRIPTION:
+		returns a random partition p of the entered weight w.
+	w must be an INTEGER object, p becomes a PARTITION object.
+	Type of partition is VECTOR . Its the algorithm of
+	Nijnhuis Wilf p.76
+
+COMMENT:
+COMPARISION
+-----------
+There are several orders on the partitions. The standard routine
+comp() uses the colexikographic order, it is :
+you read the biggest part first, if it is equal you read the next
+part and so on. This is the same order, in which the partitions
+are generated using next. But there is another order the so called
+dominance order, it is checked by the routine
+
+NAME:   
+	      dom_comp_part
+SYNOPSIS:
+	     INT dom_comp_part(OP parta, partb)
+DESCRIPTION:
+	  compares two partitions according to the dominance
+       order. At the moment only for VECTOR representation.
+RETURN:
+	       0 if equal, 1 if parta bigger then partb, -1 if parta
+       is smaller then partb, the constant NONCOMPARABLE means that parta
+       and partb are not comparable.
+
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c;
+	INT i,j;
+	anfang();
+
+	a=callocobject(); b=callocobject(); c=callocobject();
+	scan(INTEGER,a);
+	makevectorofpart(a,b); println(b);
+	m_ilih_m(S_V_LI(b),S_V_LI(b),c);
+	for (i=0L;i<S_V_LI(b);i++)
+		for (j=0L;j<S_V_LI(b);j++)
+			m_i_i(dom_comp_part(S_V_I(b,i),S_V_I(b,j)),
+			      S_M_IJ(c,i,j));
+	println(c);
+	freeall(a); freeall(b); freeall(c); 
+	ende();
+	}
+
+It prints the matrix c of the results of the comparision of all partitions
+of the weight a.
+
+COMMENT:
+Operations on partitions
+------------------------
+
+You can add partitions, i.e. you add componentwise
+
+NAME:  
+	       add_part_part
+SYNOPSIS:
+	     INT add_part_part(OP a,b,c)
+DESCRIPTION:
+	  add the two PARTITION objects a and b to the result
+       c. c must be an empty object. All the objects a,b,c must
+       be different.
+RETURN:
+	       OK or ERROR
+BUGS:  
+	       there are no checks on the types, you better use
+       the general routine add.
+
+COMMENT:
+A familiar operation on partitions is conjugation, or association,
+this is done using the the standard routine
+conjugate, or if you are an expert using the special routine
+conjugate_partition().
+
+NAME:  
+	     conjugate_partition
+SYNOPSIS:
+	   INT conjugate_partition(OP input,output)
+DESCRIPTION:
+	Computes the conjugate partition , there is no check
+        whether input is a PARTITION object, there is no check
+        whether output is an empty object. and there is no check
+        whether input and output are different pointers. All these
+        checks are done if you call the standard routine conjugate.
+
+EXAMPLE:
+
+#include "def.h"
+#include "macro.h"
+main()
+{
+OP a,b;
+anfang();
+a = callocobject();
+b = callocobject();
+
+scan(PARTITION,a);
+println(a);
+/* conjugate_partition(a,a);  produces an error */
+conjugate_partition(a,b); /* is ok */
+
+freeall(a); freeall(b);
+ende();
+}
+
+
+NAME:   
+	     fastconjugate_partition
+SYNOPSIS:
+	    INT fastconjugate_partition(OP a,b)
+DESCRIPTION: 
+	the same as conjugate_partition, and it is not
+      faster. It is only a different algorithm.
+
+COMMENT:
+Partitions are represented graphically using the ferrers diagram
+The routine to call is the standard routine ferrers, which then calls
+the routine ferrers_partition.
+
+NAME:
+	        ferrers_partition
+SYNOPSIS:
+	    INT ferrers_partition(OP part)
+DESCRIPTION:
+	 prints the ferrers diagramm to the standard output. There
+        is no check whether part is really a PARTITION object.
+
+NAME:
+	        tex_partition
+SYNOPSIS:
+	    INT tex_partition(OP part)
+DESCRIPTION:
+	to output a PARTITION object (part) in TeX format. Better to
+	use the general routine tex(OP)
+
+NAME:
+	        weight_partition
+SYNOPSIS:
+	    INT weight_partition(OP part)
+DESCRIPTION:
+	to compute the weight (sum over the parts) of a PARTITION 
+	object.
+	better use the general routine weight(OP input ,OP result)
+
+
+
+
+
+
+
+COMMENT:
+In the representation theory of the Symmetric Group you often compute
+the so called hooklengths in the ferrersdiagram. 
+
+NAME:  
+	      hook_length   
+SYNOPSIS:
+	    INT hook_length(OP part; INT i,j; OP result)
+DESCRIPTION:
+	 computes the hook length of the hook starting at position 
+        (i,j) in the ferrers diagramm. The row with index 0 is the
+        longest row. First the result is freed to an empty object.
+	This works for VECTOR and EXPONENT type.
+
+NAME:
+			remove_hook
+SYNOPSIS:
+		INT remove_hook(OP part; INT i,j; OP result)
+DESCRIPTION:
+		removes the hook at position (i,j). The result
+	may be an empty object, if the PARTITION object part
+	was an hook partition, starting at (0,0).
+BUG:
+		This works only for VECTOR type partitions.
+
+COMMENT:
+Most times you use the hook length to compute the dimension of a 
+ireducible representation of the symmetric group, which is labeled
+by a partition. You can do it directly using the standard routine
+dimension(), which calls dimension_partition
+
+NAME:  
+	      dimension_partition
+SYNOPSIS:   
+	 INT dimension_partition(OP part, result)
+DESCRIPTION:
+	 computes the dimension of the irreducible representation
+       labeled by part. There is no check whether part is a 
+       PARTITION object. The result becomes a LONGINT object, if the
+       dimension is too big. 
+BUGS:
+		It would be good, to allow skewpartitions also.
+
+COMMENT:
+Another object which is labeled by partitions are the classes and the
+centralisers of the symmetric group. We can compute their orders.
+
+NAME:  
+      ordcen
+SYNOPSIS:
+    INT ordcen(OP part,result)
+DESCRIPTION:
+ computes the order of the centraliser 
+        There is no check 
+        whether part is a PARTITION object. The result may become a
+        LONGINTobject.
+
+
+NAME:  
+             ordcon
+SYNOPSIS:
+             INT ordcon(OP part,result)
+DESCRIPTION:
+ computes the order of  the
+        class. First it frees the reult. There is no check 
+        whether part is a PARTITION object. The reult may become a
+        LONGINTobject.
+
+NAME:		
+	row_column_matrices
+SYNOPSIS:
+		INT row_column_matrices(OP a,b,c)
+DESCRIPTION:
+		you enter two partitions in VECTOR notation these 
+	are the parameters a abd b. The output is a VECTOR objects
+	whose entries are matrices of the natural numbers, whose
+	row sum is a and the column sum is b. You may also enter
+	arbitrary VECTOR object with INTEGER entries instead of
+	the PARTITION objects a and b. 
+
+
+
+NAME:   
+	     test_part
+SYNOPSIS:
+	    INT test_part()
+DESCRIPTION: 
+	does self-explanatory checks
+RETURN:
+	      OK
+
+
+COMMENT:
+GENERAL ROUTINES
+
+NAME                                     DESCRIPTION
+----------------------------------------------------------------------
+add()                                     add parts componentwise
+comp()
+conjugate()                               conjugate partition
+copy()
+dec()					  removes the biggest part
+dimension()                               dimension of irrep labeled by part
+even()					 true if corresponding S_n class
+ferrers()                                 
+first()                                   first partition 
+fprint()
+fprintln()
+freeall()
+freeself()
+init()
+last()
+length()                                  number of parts
+next()
+objectread()
+objectwrite()
+odd()					 true if corresponding S_n class
+sscan()					 input from string
+scan()                                    read interactively from terminal
+tex()                                     TeX-output
+weight()                                  sum over parts

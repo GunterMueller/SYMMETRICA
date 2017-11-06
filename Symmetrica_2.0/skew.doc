@@ -1,0 +1,55 @@
+COMMENT:
+SKEWPARTITION
+-------------
+
+This is a generalisation of PARTITION, a skewpartition
+consists if two parts, a bigger partition, and a smaller
+one whose parts are all smaller or equal to the parts of the bigger
+one. As this is a german programm we call the bigger = groesser
+and the smaller = kleiner, so the select operator are as follow
+
+
+function           MACRO              Description
+-----------------------------------------------------------------------------
+s_spa_g            S_SPA_G            select_skewpart_gross
+s_spa_k            S_SPA_K            select_skewpart_klein
+s_spa_gi           S_SPA_GI           select_skewpart_gross_ith_element
+s_spa_ki           S_SPA_KI           select_skewpart_klein_ith_element
+s_spa_gii          S_SPA_GII          select_skewpart_gross_ith_element_asINT
+s_spa_kii          S_SPA_KII          select_skewpart_klein_ith_element_asINT
+s_spa_gl           S_SPA_GL           select_skewpart_gross_length
+s_spa_kl           S_SPA_KL           select_skewpart_klein_length
+s_spa_gli          S_SPA_GLI          select_skewpart_gross_length_asINT
+s_spa_kli          S_SPA_KLI          select_skewpart_klein_length_asINT
+
+
+
+To build a SKEWPARTITION-object
+
+
+
+NAME:        	
+            b_gk_spa
+SYNOPSIS:
+		INT b_gk_spa(OP gross,klein,result)
+DESCRIPTION:
+		we enter to PARTITION-objects gross and klein, where
+	gross is the bigger one. The result becomes a SKEWPARTITION-object.
+	The difference is as in all other cases, with build (b_gk_spa)
+	the input becomes
+	part of the SKEWPARTITION-object, with make (m_gk_spa) we have a
+	copy of the input in the result.
+
+
+NAME:        	
+	m_gk_spa
+SYNOPSIS:
+		INT m_gk_spa(OP gross,klein,result)
+DESCRIPTION:
+		we enter to PARTITION-objects gross and klein, where
+	gross is the bigger one. The result becomes a SKEWPARTITION-object.
+	The difference is as in all other cases, with build (b_gk_spa)
+	the input becomes
+	part of the SKEWPARTITION-object, with make (m_gk_spa) we have a
+	copy of the input in the result.
+

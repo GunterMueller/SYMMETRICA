@@ -1,0 +1,32 @@
+COMMENT:
+WORD
+
+this is a special type of VECTOR objects. So we have the routines
+for VECTOR objects. The entries are INTEGER objects bigger then
+0.
+
+the name is s_w_...  instead of s_v_...
+
+NAME:		
+	random_word
+SYNOPSIS:
+		INT random_word(OP a,b)
+DESCRIPTION:
+		builds a random WORD object of the length given by the
+	INTEGER object a. The entries are INTEGER objects with the
+	maximum value 2 times the length = a.
+RETURN:
+			OK or not OK.
+
+NAME:
+			test_word
+SYNOPSIS:
+		INT test_word()
+DESCRIPTION:
+		checks the installation
+
+COMMENT:
+	general routines:
+
+	copy()
+	inhalt()

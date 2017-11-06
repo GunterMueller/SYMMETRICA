@@ -1,0 +1,297 @@
+COMMENT:
+TABLEAUX
+--------
+
+Tableaux are objects with two components, the shape
+(umriss) and the tableaux themselfes, which is a particular
+matrices. The entries of the matrices are INTEGERS or
+empty objects. Look at the following example. The
+tableau
+
+      3
+      2 3
+      1 2 3
+
+is the MATRIX
+
+       [1:2:3]
+       [2:3:#]
+       [3:#:#]
+
+and the shape is the PARTITION 123. But you can also have 
+TABLEAUX whose shape is of type SKEWPARTITION.
+
+For further information you also may look in the file
+kostka.doc.
+
+We have the following basic routines:
+NAME             MACRO        DESCRIPTION
+----------------------------------------------------------------------
+s_t_s            S_T_S        select_tableaux_self
+s_t_ij           S_T_IJ       select_tableaux_ij-th_element
+s_t_iji          S_T_IJI      select_tableaux_ij-th_element_as_INT
+s_t_l            S_T_L        select_tableaux_length
+s_t_li           S_T_LI       select_tableaux_length_as_INT
+s_t_h            S_T_H        select_tableaux_height
+s_t_hi           S_T_HI       select_tableaux_height_as_INT
+s_t_u            S_T_U        select_tableaux_umriss
+s_t_ui           S_T_UI       select_tableaux_umriss_ith_element
+s_t_uii          S_T_UII      select_tableaux_umriss_ith_element_as_INT
+s_t_ul           S_T_UL       select_tableaux_umriss_length
+s_t_uli          S_T_ULI      select_tableaux_umriss_length_as_INT
+s_t_ug           S_T_UG       select_tableaux_umriss_gross (only SKEW)
+s_t_ugi          S_T_UGI      select_tableaux_umriss_gross_ith_element
+s_t_ugii         S_T_UGII     select_tableaux_umriss_gross_ith_element_as_INT
+s_t_ugl          S_T_UGL      select_tableaux_umriss_gross_length
+s_t_ugli         S_T_UGLI     select_tableaux_umriss_gross_length_as_INT
+s_t_uk           S_T_UK       select_tableaux_umriss_klein (only SKEW)
+s_t_uki          S_T_UKI      select_tableaux_umriss_klein_ith_element
+s_t_ukii         S_T_UKII     select_tableaux_umriss_klein_ith_element_as_INT
+s_t_ukl          S_T_UKL      select_tableaux_umriss_klein_length
+s_t_ukli         S_T_UKLI     select_tableaux_umriss_klein_length_as_INT
+b_us_t                        build_umriss_self_tableaux
+m_us_t                        make_umriss_self_tableaux
+
+
+NAME:		
+	 b_matrix_tableaux
+SYNOPSIS:	
+	 INT b_matrix_tableaux(OP a,b)
+DESCRIPTION:
+		 you enter a MATRIX object a, which is a valid self 
+	part for a TABLEAUX object. The routine computes the information
+	for the umriss part, and build a new TABLEAUX object b, whose
+	self part is the object a. So a is a part of the result, you 
+	should not free it.
+
+NAME:  
+	          m_u_t		make_umriss_tableaux
+SYNOPSIS: 
+	       INT m_u_t(OP a,b)
+DESCRIPTION:
+	     You only enter the shape of the tableau a PARTITION
+	a SKEWPARTITION object, and the routine generates a MATRIX
+	object for the self part, which is big enough, the umriss
+	part is a copy of the first parameter a, which is already indicated
+	by the name make_umriss_tableaux. So the result is a TABLEAUX
+	object b.
+
+COMMENT:
+With every tableau or skewtableau you have an associated word, which
+you get if you read the entries in a certain order.
+
+NAME:  
+          wordoftableaux
+SYNOPSIS:
+        INT wordoftableaux(OP a,b)
+
+NAME:
+            rowwordoftableaux
+SYNOPSIS:
+        INT rowwordoftableaux(OP a,b) 
+
+NAME:
+            columnwordoftableaux
+SYNOPSIS:
+        INT columnwordoftableaux(OP a,b)
+
+COMMENT:
+To access the rows and columns of the tableaux, we have routines
+which give you the last and first index of the entries:
+
+NAME:  
+          spaltenanfang
+SYNOPSIS:
+        INT spaltenanfang(OP a, INT b)
+DESCRIPTION:
+     returns the row number of the first entry in the column
+      labeled by b. If b is a index which is too big it returns the
+      value of s_t_hi(a).
+ERROR:
+           if b is negative you get an error
+
+NAME: 
+           spaltenende
+SYNOPSIS:
+        INT spaltenende(OP a, INT b)
+DESCRIPTION:
+     returns the row number of the last entry in the column
+      labeled by b. If b is a index which is too big it returns -1L
+ERROR:  
+         if b is negative you get an error
+
+
+NAME: 
+           zeilenanfang
+SYNOPSIS:
+        INT zeilenanfang(OP a, INT b)
+DESCRIPTION:
+     returns the column number of the first entry in the row
+      labeled by b. If b is a index which is too big it returns the
+      value of s_t_li(a).
+ERROR:    
+       if b is negative you get an error
+
+NAME: 
+           zeilenende
+SYNOPSIS:
+        INT zeilenende(OP a, INT b)
+DESCRIPTION: 
+    returns the column number of the last entry in the row
+      labeled by b. If b is a index which is too big it returns -1L
+ERROR: 
+          if b is negative you get an error
+
+
+NAME:
+		standardp
+SYNOPSIS:
+	INT standardp(OP a)
+DESCRIPTION:
+	To check whether we have really a tableau, i.e. weakly increasing in
+	rows and strictly increasing in the columns:
+    return TRUE if we have a TABLEAUX object a, and the
+	conditions on the content are fulfilled.
+	it returns FALSE else
+
+
+NAME:	
+	first_ym
+SYNOPSIS:
+	INT first_ym(OP part,res)
+DESCRIPTION:
+	generates the first Yamanouchi word, it is a
+	VECTOR object with INTEGER entries, which codes a
+	standard tableau.
+
+NAME:
+		nxt_ym
+SYNOPSIS:
+	INT nxt_ym(OP a,b)
+DESCRIPTION:
+	computes the next Yamanouchi word after the
+	Yamanouchi word a. It return TRUE if it is possible,
+	in this case b ist the next word.
+	If we have already the last word, the function returns FALSE.
+EXAMPLE:
+	........
+	scan(PARTITION,form);
+	first_ym(form,ym);
+	dimension(form,nb);
+	do
+	{
+		println(ym);
+	}while(nxt_ym(ym,ym));
+
+
+
+NAME:          
+  inhalt_tableaux
+SYNOPOSIS:
+       INT inhalt_tableaux(OP a,b)
+DESCRITPION:
+	A interessting routine is to compute the content of a 
+	tableau, i.e. the number of entries of each type, it is an integer
+	vector, where the first entry is the number of 1's in the tableau
+	the second entry is  the number of 2's and so on.
+	
+
+
+NAME:            
+	m_matrix_umriss
+SYNOPSIS:        
+	INT m_matrix_umriss(OP a,b)
+DESCRIPTION:
+	given a MATRIX, which is a tableau, 
+	we can compute the shape(umriss)
+
+
+
+NAME:		
+	select_row
+SYNOPSIS:
+		select_row(OP a; INT i; OP b)
+DESCRIPTION:
+	    this routine is more or less the same as for MATRIX objects,
+	you transform the i-th row into VECTOR object, which contains the
+	entries of the i-th row, if the i-th row is empty, you get an
+	empty object.
+
+NAME:		
+		select_column
+SYNOPSIS:
+		select_column(OP a; INT i; OP b)
+DESCRIPTION:
+	    this routine is more or less the same as for MATRIX objects,
+	you transform the i-th column into VECTOR object, which contains the
+	entries of the i-th column, if the i-th column is empty, you get an
+	empty object.
+
+NAME:
+	            inverse_jeudetaquin_tableaux
+SYNOPSIS:
+	        INT inverse_jeudetaquin_tableaux(OP ta; INT i,j; OP erg)
+DESCRIPTION:
+A very interesting routine is the inverse Jeu de Taquin. You
+enter a arbitrary tableaux, and a coordinate at the right border,
+and now you can apply the inverse Jeu de Taquin. The result is a
+tableau with an entry at the starting point and a new free place
+at the left border.
+
+	
+
+
+NAME:     
+	       inverse_nilplactic_jeudetaquin_tableaux
+SYNOPSIS:
+	        INT inverse_nilplactic_jeudetaquin_tableaux
+                     (OP ta; INT i,j; OP erg)
+DESCRIPTION:
+	same as inverse_jeudetaquin_tableaux put using the
+	nilplactic relations instead of the  plactic  relations
+
+
+NAME: 
+	            lehmercode_tableaux
+SYNOPSIS:
+	         INT lehmercode_tableaux(OP a,b)
+DESCRIPTION:
+	      computes a LIST b of tableaux, which are reduced
+	decomposition of the perm, given by the lehmercode a.
+
+NAME:
+			  operate_perm_tableaux
+SYNOPSIS:	
+	  INT operate_perm_tableaux(OP a,b,c)
+DESCRIPTON:
+		  permutes the entries (INTEGER) of a TABLEAUX object b
+	according to PERMUTATION object a. The result is a TABLEAUX
+	object c.
+
+NAME:
+			perm_tableaux
+SYNOPSIS:
+		INT perm_tableaux(OP a,b)
+DESCRIPTION:
+	 	computes the LIST a of TABLEAUX objects, which are a reduced 
+	decomposition of the PERMUTATION object a.
+
+COMMENT:
+general routines for TABLEAUX
+-----------------------------
+
+comp()
+copy()
+fprint()          prints the tableau on the given file pointer
+fprintln()
+freeall()
+freeself()
+inc()             adds a empty row and a empty column 
+inhalt()          computes the content, result is a VECTOR object
+objectread()
+objectwrite()
+print()
+println()
+tex()		  ONLY for PARTITION shape
+select_row()
+select_column()

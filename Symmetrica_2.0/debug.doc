@@ -1,0 +1,139 @@
+COMMENT:
+	DEBUG
+	-----
+
+	This is the description of the routines for debugging information
+	and for the handling of a few global variables.
+
+NAME:        
+	anfang
+SYNOPSIS:    
+	INT anfang()
+DESCRIPTION: 
+	must be called as the first routine of all SYMMETRICA
+       programs. Is part of the macro ANFANG, which you may use
+	to do example like this:
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	ANFANG
+	scan(INTEGER,a);
+	println(a);
+	ENDE
+
+NAME:        
+	debugprint
+SYNOPSIS:    
+	INT debugprint(OP a)
+DESCRIPTION: 
+	prints the object a with detailed information for
+       debugging, this works for 
+		AUGPART,COMP,CYCLOTOMIC,
+		BRUCH,ELM_SYM,FINITEFIELD,GRAL,HOM_SYM,INTEGER,
+		KRANZTYPUS,LIST,LONGINT
+		MATRIX,MONOM,MONOMIAL,MONOPOLY,PARTITION,PERMUTATION,
+		POW_SYM,SCHUBERT,SCHUR,SKEWPARTITION,
+		SQ_RADICAL,TABLEAUX,VECTOR,WORD,
+	There is a global variable INT doffset which contains the indent
+	for the printing of nested structures
+
+NAME:        
+	ende
+SYNOPSIS:    
+	INT ende()
+DESCRIPTION: 
+	must be called as the last routine of all SYMMETRICA
+       programms. Is part of the macro ENDE, which you may use
+
+NAME:        
+	error
+SYNOPSIS:    
+	INT error(char * text)
+DESCRIPTION: 
+	prints the error message text to stderr, and reads
+	a charcter from stdin, if the character is 'g' it goes on,
+	if the character is 'a' it calls abort (i.e. core dump on 
+	UNIX) , 'f' goes on without error breaks, 's' goes on
+	without error breaks and it doesnt write the error messages,
+	'r' gives an return code, which enables the caller of the
+	error routine to do a 'retry'.
+	Else it stops the programm with the call of exit
+	There is a global variable INT sym_background, which is set
+	to 0 by default, if you set this variable to a value != 0L
+	the programm will stop after the first error without input
+	from the terminal 
+RETURN:      
+	ERROR if the input was 'g'
+	ERROR_RETRY if the input was 'r'
+
+
+NAME:        
+	fusedmemory
+SYNOPSIS:    
+	INT fusedmemory(FILE *fp; char * text)
+DESCRIPTION: 
+	prints the used memory on the given filepointer
+       together with the given text.
+BUGS:        
+	does not work in all installations
+
+NAME:	     
+	no_memory
+SYNOPSIS:    
+	INT no_memory()
+DESCRIPTION: 
+	prints an error message saying, that no memory
+	is left.
+
+NAME:        
+	print_time
+SYNOPSIS:    
+	INT print_time()
+DESCRIPTION: 
+	prints the actual time to stdout
+
+NAME:        
+	runtime
+SYNOPSIS:    
+	INT runtime(INT *l)
+DESCRIPTION: 
+	l contains the number of seconds since start of the program.
+
+
+COMMENT:
+	There are also some global variables, which are initialised in the
+	file debug.c. These are 
+		OP cons_null
+		OP cons_eins
+		OP cons_zwei
+	You may use them later on if you need the numbers 0,1,2.
+	example:
+		main ()
+		{
+		OP c;
+		anfang();
+		c= callocobject();
+		hoch(cons_zwei,cons_zwei,c);
+		println(c);
+		freeall(c);
+		ende();
+		}
+	which produces the output 4.
+
+	There are routines
+
+		SYM_calloc
+		SYM_realloc
+		SYM_malloc
+		SYM_free
+
+	they are used for the memory managment, you may insert the lines
+
+	#define SYM_calloc(a,b) calloc(a,b)
+	#define SYM_realloc(a,b) realloc(a,b)
+	#define SYM_malloc(a) malloc(a)
+	#define SYM_free(a,b) free(a)
+
+	to use the standard routines from your compiler, these four routines
+	are inserted for debug reasons.
+

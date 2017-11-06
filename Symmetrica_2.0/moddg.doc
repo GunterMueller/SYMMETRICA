@@ -1,0 +1,55 @@
+COMMENT:
+	MODDG
+	-----
+
+NAME:		
+	brauer_char
+SYNOPSIS:	
+	INT brauer_char(OP sn,OP prime,OP bc)
+DESCRIPTION:
+	computes the table (MATRIX object) of brauer characters for the
+	symmetric group of degree sn (INTEGER object) and given prime
+	(INTEGER object)
+
+NAME:       
+	decp_mat
+SYNOPSIS:  
+	INT decp_mat(OP n,OP p,OP dmat) 
+DESCRIPTION: 
+	computes the decomposition matrix to the symmetric 
+	group Sn of degree n for the prime p.
+         The result is the MATRIX object dmat.
+	The routine first looks for the file decommix.dat in the
+	actual directory. This file is generated during a previous 
+	run of the routine decp_mat. So if the values are already
+	stored in this file you get an imediate answer. Problems
+	arise if the data in this file is corrupted because of 
+	errors in previous runs. So to get the programm working
+	correctly you have to remove this file decommix.dat
+
+NAME:		
+	dimension_mod
+SYNOPSIS:	
+	INT dimension_mod(OP part, OP prim, OP res)
+DESCRIPTION:	
+	computes the dimension of the modular irreducible
+	representation labeled by the PARTITION object part,
+	modulo the INTEGER object prim. 
+
+NAME:		
+	schnitt_mat
+SYNOPSIS:	
+	INT schnitt_mat(OP part, OP n, OP res)
+DESCRIPTION:	
+	this computes the matrix, whose modular rang gives the dimenion
+	of the irreducible modular representation.
+
+NAME:
+	moddg
+SYNOPSIS:
+	INT moddg(prime,llambda,pi,dmat) OP prime; OP llambda; OP pi; OP dmat;
+DESCRIPTION:
+	computes a modular irreducible representation for the PERMUTATION object
+	pi. The result is a MATRIX object with INTEGER entries. The representation is 
+	labbeled by the PARTITION object llambda. The prime is the first parameter,
+	a INTEGER object.

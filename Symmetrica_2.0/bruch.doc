@@ -1,0 +1,80 @@
+COMMENT:
+	BRUCH
+	-----
+
+	This is an object which corresponds to fractions (german: Bruch).
+	There a two parts, the nominator (called oben) and the denominator
+	(called unten).
+
+
+	To select these parts, to change these parts or to build new 
+	BRUCH objects out of these parts there are the following routines 
+	or macros
+
+	routine               macro                description
+	---------------------------------------------------------------------
+	s_b_o                 S_B_O                select_bruch_oben
+	s_b_u                 S_B_U                select_bruch_unten
+	s_b_oi                S_B_OI               select_bruch_oben_integer
+	s_b_ui                S_B_UI               select_bruch_unten_integer
+	c_b_o                 C_B_O                change_bruch_oben
+	c_b_u                 C_B_U                change_bruch_unten
+	b_ou_b                                     build_oben_unten_bruch
+	m_ou_b                                     make_oben_unten_bruch
+	m_ioiu_b                                   make_integeroben_
+						      integerunten_bruch
+
+	A special routine for BRUCHobjects is
+
+NAME:        
+	kuerzen
+SYNOPSIS:    
+	INT kuerzen(OP a)
+DESCRIPTION: 
+	computes the greatest common divisor of nominator and
+       denominator and
+       tries to divide nominator and denominator of the BRUCHobject a
+       by this object. 
+RETURN:      
+	OK or ERROR
+       
+
+
+NAME:        
+	test_bruch
+SYNOPSIS:    
+	INT test_bruch()
+DESCRIPTION:
+	For testing of the implementation
+
+
+COMMENT:
+	GENERAL ROUTINES:
+	-------------------------------------------------------------------
+	absolute()
+	add()
+	add_apply()
+	addinvers()
+	addinvers_apply()
+	comp()
+	copy()
+	div()
+	einsp()                                   test on unity
+	fprint()
+	fprintln()
+	freeall()
+	freeself()
+	hoch()
+	invers()
+	mult()
+	mult_apply()
+	negeinsp()                                test on minus unity
+	negp()                                    test on negative
+	nullp()                                   test on null
+	objectread()
+	objectwrite()
+	posp()                                    test on positive
+	print()
+	println()
+	scan()
+	tex()

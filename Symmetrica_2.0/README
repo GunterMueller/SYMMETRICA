@@ -1,0 +1,12 @@
+this is a first version of SYMMETRICA V2.0 
+you get all the source files (*.c) plus
+header files (*.h) and some documentation (*.doc)
+
+to build a first example simply use the
+makefile which builds one executable
+calculating the factorial.
+
+the file used in the example (test.c) is
+the only file not necessary for the library
+to work. so if you want to do something
+else substiute this file.

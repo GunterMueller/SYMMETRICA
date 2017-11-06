@@ -1,0 +1,14 @@
+COMMENT
+PR
+--
+	projective representations of th esymmetric group
+
+NAME:       
+	prsym 
+SYNONPSIS:  
+	INT prsym(OP lambda, OP T_v) 
+DESCRIPTION: 
+	computes the matrix representation of the involutions
+	t_k which generate (together with -Id) the covering group T'_n
+	(in Schur's notation) of S_n and stores them as MATRIX objects 
+	in the VECTOR object T_v.

@@ -1,0 +1,302 @@
+COMMENT:
+	INTEGER
+
+	This is a basic object type of SYMMETRICA. The first step is
+	the generation of an INTEGERobject. Look at the following
+	program
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	INT b = 5L;
+	OP a = callocobject();
+	anfang();
+	m_i_i(b,a);
+	println(a);
+	freeall(a);
+	ende();
+	}
+
+
+	Here is a short explanation: SYMMETRICA uses the type INT for 
+	integervalues,
+	INT is an C type integer, which is always four byte long. It is in
+	most cases the type long of C. Therefore you must say 5L, in order to 
+	specify an 4-byte integer. This is a problem of C and not of SYMMETRICA. 
+	In that code, you have an emptyp object a, which becomes an INTEGERobject 
+	with value
+	5. Then the object is printed to the terminal, using the
+	standard routine println(); The complete description of m_i_i()
+	now follows.
+
+NAME:   
+        m_i_i
+SYNOPSIS:   
+	    INT m_i_i(INT integer; OP integerobject)
+DESCRIPTION: 
+  builds an integerobject with value integer. First
+	it is checked whether integerobject is an empty object, if 
+	not it is freed first.
+RETURN:
+         the returnvalue is OK, or ERROR if an error
+	occured.
+MACRO:
+          there is also a macro version M_I_I which does the
+	same without a check on empty object.
+
+
+COMMENT:
+	If you have an INTEGERobject you sometimes want to select the
+	INTvalue of the object. Look at the following piece of code.
+
+
+	.
+	.
+	.
+	m_i_i(8L,a);
+	printf("%d",s_i_i(a)+5);
+	.
+	.
+	.
+
+	For that purpose you have the routine s_i_i()
+
+NAME: 
+	          s_i_i
+SYNOPSIS:      
+	 INT s_i_i(OP integerobject)
+DESCRIPTION:
+	    selects the INTvalue of integerobject. There is
+	first a check whether it is an INTEGERobject or not.
+RETURN:
+	         the returnvalue is the INTvalue or ERROR if an error occured
+MACRO: 
+	         there is also a macro version S_I_I which does the
+	same without a check on INTEGERobject.
+
+
+COMMENT:
+	The last problem is to change the value of an existing INTEGERobject. 
+	This is done using the routine c_i_i().
+
+	.
+	.
+	.
+	m_i_i(5L,a);println(a);
+	c_i_i(a,7L);println(a);
+	.
+	.
+	.
+	will first print a line with the number 5, and then a line with the
+	number 7.
+
+NAME:           
+	c_i_i              
+SYNOPSIS:
+	       INT c_i_i(OP integerobject;INT integervalue)
+DESCRIPTION: 
+	   changes the INTvalue of integerobject. There is
+	first a check whether it is an INTEGERobject or not.
+RETURN:
+	         the returnvalue is OK or ERROR if an error occured
+MACRO:         
+ there is also a macro version C_I_I which does the
+	same without a check on INTEGERobject.
+
+COMMENT:
+	For sake of consistency there is also a routine b_i_i(), which means
+	build_integervalue_integerobject, for the construction of an 
+	INTEGERobject, but because of the input of an INTvalue, there
+	is no difference between this routine and the routine m_i_i().
+	These are the basic routines, let us now look at some particular
+	ones: 
+
+
+NAME:   
+	        intlog
+SYNOPSIS:
+	       INT intlog(OP integerobject)
+DESCRIPTION:
+	    computes the number of digits of the INTEGERobject.
+         The result is the return value, which is always >0.
+
+COMMENT:
+	For the generation of random INTEGERobjects, look at 
+	the following codefragment:
+	.
+	INT i;
+	.
+	.
+	scan(INTEGER,upperbound);
+	scan(INTEGER,lowerbound);
+	for (i=0L;i<1000L;i++)
+		{
+		random_integer(result,lowerbound,upperbound);
+		println(result);freeself(result);
+		}
+	.
+	.
+	.
+	which prints 1000 random numbers between the upper and lower 
+	bound. Because this is a lowlevel routine, you have to free
+	the result object, before you call the routine.
+
+NAME:   
+	        random_integer     
+SYNOPSIS:
+	       INT random_integer(OP result,lowerbound,upperbound)
+DESCRIPTION:
+	    computes a random INTEGERobject, between upper and lower
+	bound. The result is greater equal lowerbond and strictly less then
+	the upperbound. Both bounds are INTEGER objects.
+	If lowerbound is NULL, then the default is 0.
+	if upperbound is NULL, the default is lowerbound+10
+	It works also if upperbound is of type LONGINT.
+RETURN:
+	         the returnvalue is OK or ERROR if an error occured
+
+NAME:
+			scan_integer
+SYNOPSIS:
+		INT scan_integer( OP a)
+DESCRIPTION:
+		the sub routine for reading interactivly an
+	INTEGER object. There will be an error message if it was not possible
+	to interpret the input (e.g. if you enter something, which is no
+	number).  You should use scan(INTEGER,a) instead.
+
+NAME:  
+	         test_integer     
+SYNOPSIS:
+	       INT test_integer()
+DESCRIPTION:
+	    tests the implementation
+
+NAME:
+	mult_integer
+SYNOPSIS:
+	INT mult_integer(OP a,b,c)
+DESCRIPTION:
+	this is a undocumented subroutine of INT mult(OP a,b,c)
+	You better use this general routine.
+
+NAME:
+	add_integer
+SYNOPSIS:
+	INT add_integer(OP a,b,c)
+DESCRIPTION:
+	this is a undocumented subroutine of INT add(OP a,b,c)
+	You better use this general routine.
+
+NAME:
+	invers_integer
+SYNOPSIS:
+	INT invers_integer(OP a,b)
+DESCRIPTION:
+	this is a undocumented subroutine of INT invers(OP a,b)
+	You better use this general routine.
+
+NAME:
+	copy_integer
+SYNOPSIS:
+	INT copy_integer(OP a,b)
+DESCRIPTION:
+	this is a undocumented subroutine of INT copy(OP a,b)
+	You better use this general routine.
+
+NAME:
+	dec_integer
+SYNOPSIS:
+	INT dec_integer(OP a)
+DESCRIPTION:
+	this is a undocumented subroutine of INT dec(OP a). The 
+	INTEGER object a is decreased by 1.
+	You better use the general routine dec.
+
+NAME:
+	tex_integer
+SYNOPSIS:
+	INT tex_integer(OP a)
+DESCRIPTION:
+	this is a undocumented subroutine of INT tex(OP a). The 
+	INTEGER object a is transformed into tex-source-code.
+	You better use the general routine tex.
+
+NAME:
+	inc_integer
+SYNOPSIS:
+	INT inc_integer(OP a)
+DESCRIPTION:
+	this is a undocumented subroutine of INT inc(OP a). The 
+	INTEGER object a is increased by 1.
+	You better use the general routine inc.
+
+NAME:
+	ggt_integer
+SYNOPSIS:
+	INT ggt_integer(OP a,b,c)
+DESCRIPTION:
+	this is a undocumented subroutine of INT ggt(OP a,b,c). The 
+	routine computes the greatest common divisor of the two INTEGER
+	objects a and b.
+	You better use the general routine ggt.
+
+NAME:
+	mod_integer
+SYNOPSIS:
+	INT mod_integer(OP a,b,c)
+DESCRIPTION:
+	this is a undocumented subroutine of INT mod(OP a,b,c). The 
+	routine computes the a mod b of the two INTEGER
+	objects a and b.
+	You better use the general routine mod.
+
+COMMENT:
+	GLOBAL CONSTANTS
+	----------------
+	as you often need special INTEGER objects, there are some global
+	INTEGER objects, there are:
+
+	OP cons_eins			the INTEGER object with value 1
+	OP cons_null			the INTEGER object with value 0
+	OP cons_zwei			the INTEGER object with value 2
+	OP cons_negeins			the INTEGER object with value -1
+
+	so you may use these global variables instead of generating your
+	own variables containing these often used INTEGER objects. But you 
+	are not allowed to free these variables or changing these 
+	variables. This will generate bad results in all the routines 
+	which trust on the values of these global variables.
+
+
+
+	GENERAL ROUTINES
+	----------------
+	add()
+	add_apply()
+	addinvers()
+	addinvers_apply()
+	comp()
+	copy()
+	div()
+	einsp()
+	fprint()
+	fprintln()
+	ganzdiv()
+	hoch()
+	invers()
+	mod()
+	mult()
+	mult_apply()
+	negp()
+	negeinsp()
+	nullp()
+	objectread()
+	objectwrite()
+	posp()
+	print()
+	println()
+	scan()			input from stdin=terminal
+	sscan()
+	tex()

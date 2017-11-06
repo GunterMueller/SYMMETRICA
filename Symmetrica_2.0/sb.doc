@@ -1,0 +1,250 @@
+COMMENT:
+SYMMETRICA: sb.doc
+
+##############################################################
+
+SCHUBERT
+--------
+
+This is a special kind of LISTobjects, the elements of the
+list are MONOM objects, where the self part are PERMUTATION
+objects, this is like POLYNOM or SCHUR objects.
+
+
+To access the parts of the object there are the macros and 
+routines
+
+ROUTINE          MACRO            DESCRIPTION
+---------------------------------------------------
+s_sch_s          S_SCH_S          select_schubert_self
+s_sch_si         S_SCH_SI         select_schubert_self_ith
+s_sch_sii        S_SCH_SII        select_schubert_self_ith_asINT
+s_sch_sl         S_SCH_SL         select_schubert_self_length
+s_sch_sli        S_SCH_SLI        select_schubert_self_length_asINT
+s_sch_n          S_SCH_N          select_schubert_next
+s_sch_k          S_SCH_K          select_schubert_koeff
+s_sch_ki         S_SCH_KI         select_schubert_koeff_asINT
+
+
+NAME:		
+	m_perm_sch
+SYNOPSIS:	
+	INT m_perm_sch(OP perm, res)
+DESCRIPTION:	
+	build out of a PERMUTATION object perm,
+	a SCHUBERT object res, which is labeled by a copy
+	of the permutation and which has coefficent 1.
+	Compare this with the functions m_pa_s, which 
+	does the same for SCHUR objects.
+
+COMMENT:
+As the Schubertpolynomials form a basis of the ring of polynomials
+in several variables there are routines for the change
+of basis
+
+NAME:          
+	t_POLYNOM_SCHUBERT
+SYNOPSIS:      
+	INT t_POLYNOM_SCHUBERT(OP a,b)
+DESCRIPTION:   
+	you enter a POLYNOM object a and the result is
+        the corresponding SCHUBERT object b. The variables a and b
+	may be equal.
+
+NAME:          
+	t_SCHUBERT_POLYNOM
+SYNOPSIS:      
+	INT t_SCHUBERT_POLYNOM(OP a,b)
+DESCRIPTION:   
+	you enter a SCHUBERT object a and the result is
+        the corresponding POLYNOM object b.
+
+
+NAME:		
+	divdiff_perm_schubert
+SYNOPSIS:	
+	INT divdiff_perm_schubert(OP perm,sb,res)
+DESCRIPTION:	
+	applys the divided difference operator labeled by
+	the PERMUTATION object perm on the SCHUBERT object sb.
+	The result is a new SCHUBERT object res.
+	Better us the general routine divdiff.
+
+
+COMMENT:
+As Schubert polynomials are objects labeled by PERMUTATION objects
+it is natural to have the following routines
+
+NAME:          
+	m_lehmer_schubert_monom_summe
+SYNOPSIS:      
+	INT m_lehmer_schubert_monom_summe(OP a,b)
+DESCRIPTION:   
+	you enter a VECTOR object, which is a Lehmer code
+        (cf. PERMUTATION)  and the output is a POLYNOMobject b,
+        which is the Schubert polynom, labeled by the permutation
+        given by the Lehmer code.
+
+NAME:         
+	 m_perm_schubert_monom_summe
+SYNOPSIS:  
+	    INT m_perm_schubert_monom_summe(OP a,b)
+DESCRIPTION:
+	  you enter the
+        PERMUTATION object a which labels the Schubert polynomial,
+        the output is the POLYNOM object b.
+
+NAME:  
+	        m_perm_2schubert_monom_summe
+SYNOPSIS:
+	      INT m_perm_schubert_monom_summe(OP a,b)
+DESCRIPTION:
+	   this routine computes the double schubert monomial
+	coreesponding to the 
+        PERMUTATION object a which labeles the Schubert polynomial,
+        the output is the POLYNOM object b. The self part of this 
+	POLYNOM object is to be interpreted as follows:
+		position 0 is the exponent of the factor (x_1 - y_1)
+		position 1 is the exponent of the factor (x_1 - y_2)
+		position 2 is the exponent of the factor (x_2 - y_1)
+		position 3 is the exponent of the factor (x_1 - y_3)
+		position 4 is the exponent of the factor (x_2 - y_2)
+		position 5 is the exponent of the factor (x_3 - y_1)
+		...
+	as an example look at the output of the permutation 2 3 4 1
+	it is the polynomial 1 [1,0,1,0,0,1] this is the product
+	(x_1 - y_1)(x_2 - y_1)(x_3 - y_1)
+
+NAME:		
+	m_perm_2schubert_operating_monom_summe
+SYNOPSIS:	
+	INT m_perm_2schubert_operating_monom_summe(OP a,b,c)
+DESCRIPTION:	
+	computes the double Schubert polynomial indexed by
+	the PERMUTATION object a, and substitutes the second alphabet
+	by the permuted first alphabet (the permutation is given by
+	the PERMUTATION object b)
+	The result is a POLYNOM object (the monomial expansion)
+
+NAME:      
+	    m_perm_schubert_qpolynom
+SYNOPSIS:
+	      INT m_perm_schubert_qpolynom(OP a,b)
+DESCRIPTION:
+	   as the routine m_perm_schubert_monom_summe, but you
+        specify the alphabet a,b,c,... of the result as follows
+        a->q^0 b->q^1 c->q^2 ... So the result is a POLYNOM object b
+        in the alphabet of one variable.
+
+NAME:  
+	        m_perm_schubert_dimension
+SYNOPSIS:
+	      INT m_perm_schubert_dimension(OP a,b)
+DESCRIPTION:
+	   as the routine m_perm_schubert_monom_summe, but you
+        specify the alphabet a,b,c,... of the result as follows
+        a->1 b->1 c->1 ... So the result is a INTEGER object b.
+
+NAME:  
+	        m_i_schubert
+SYNOPSIS:
+	      INT m_i_schubert(INT a; OP b)
+DESCRIPTION:
+	   transform the INTEGER object a to a SCHUBERT object b,
+	where a is the koeffizent of the identity permutation.
+RETURN:
+	        OK;
+
+NAME:
+			t_2SCHUBERT_POLYNOM
+SYNOPSIS:
+		INT t_2SCHUBERT_POLYNOM(OP a,b)
+DESCRIPTION:
+		to transfer the special POLYNOM object a, whose
+	format was described in m_perm_2schubert_monom_summe, into
+	an ordinary POLYNOM object, whose self part is a MATRIX object
+	with two rows. (to code the 2 sets of variables)
+
+NAME:
+			 eval_2schubert
+SYNOPSIS:
+		INT eval_2schubert(OP a,vec,b)
+DESCRIPTION:
+		this routine specialices the second set of variables
+	of double schubert polynomial a (this is a POLYNOM object
+	in two sets of variables = result of the function  t_2SCHUBERT_POLYNOM)
+	so you have to enter a VECTOR object vec which contains the
+	values which should replace the variables of the second set.
+	See also the function eval_polynom which has a simliar syntax.
+EXAMPLE:
+
+NAME:
+		exchange_alphabets
+SYNOPSIS:	
+	INT exchange_alphabets(OP a,b) 
+DESCRIPTION:
+		this routine exchanges the two sets of variables in a 
+	POLYNOM object a, which should be the result of a earlier call
+	to t_2SCHUBERT_POLYNOM. The result is the POLYNOM object b
+
+NAME:  
+	        test_schubert
+SYNOPSIS: 
+	     INT test_schubert()
+DESCRIPTION:
+	   tests the installation
+
+NAME:
+			tex_2schubert_monom_summe
+SYNOPSIS:
+		INT   tex_2schubert_monom_summe(OP a)
+DESCRIPTION:
+		this is to provide a  TeX output of the POLYNOM
+	object which was described in m_perm_2schubert_monom_summe.
+	
+
+NAME:  
+	        println_schub_lehmer
+SYNOPSIS:
+	      INT println_schub_lehmer(OP schub)
+DESCRIPTION:
+	   prints a SCHUBERT object schub to stdout, but instead
+        of the permutations it prints the Lehmer code of the permutations,
+        which label one Schubert polynomial.
+
+NAME:
+        outerproduct_schubert
+SYNOPSIS:
+        INT outerproduct_schubert(OP perma,permb,result)
+DESCRIPTION:
+        you enter two PERMUTATION objects, and the result is
+        a SCHUBERT object, which is the expansion of the product
+        of the two schubertpolynomials, labbeled by
+        the two PERMUTATION objects perma and permb.
+
+
+
+COMMENT:
+GENERAL ROUTINES
+----------------
+
+add()
+add_apply()
+addinvers()
+comp()
+dimension()
+einsp()
+fprint()
+fprintln()
+freeall()
+freeself()
+hoch()
+mult()
+mult_apply()
+nullp()
+objectread()
+objectwrite()
+print()
+println()
+qdimension()
+tex()

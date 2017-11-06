@@ -1,0 +1,100 @@
+
+SYMMETRICA 
+
+There are some differences between SYMMETRICA and earlier 
+SYMCHAR Versions, so read this chapter carefully.
+There is now a unified approach in naming the routines of
+SYMMETRICA. There are routines to select parts of a bigger
+object, their names start with
+
+                s_ ......
+
+which means select_ .....
+There are routines to change parts of a bigger object, their names
+start with
+
+                c_ ......
+
+which means change_ ......
+
+In order to construct new objects out of smaller ones, you have to look
+at two different methods. One method is to build out of smaller
+parts the bigger one, so that the smaller ones are part of
+the bigger one, so if you delete the bigger one, you also delete
+the smaller ones, or if you delete the smaller one, you delete
+also parts of the bigger one. This method of construction
+is done by routines with the name
+
+                b_ ......
+
+which means build_ ....
+
+The second method is  to do the same but to use copies of the smaller
+objects, so that the bigger object is independent of the smaller one.
+These are the routines with the name
+
+                m_ ......
+
+which means make_ .....
+
+These conventions are used for all the routines in SYMMETRICA. 
+
+
+
+
+
+
+
+
+HOW TO WRITE A PROGRAM
+
+______________________
+
+You have to write your own C program, using the routines given
+to you by SYMMETRICA. The general outline is as follows:
+
+main() {
+.
+.
+anfang();
+.
+.
+ende(); 
+.
+.
+}
+
+So the smallest possible SYMMETRICA progam is
+
+main(){anfang();ende();}
+
+The whole package handles objects, which may be different things,
+but which can be handled by the same routine. Look at the 
+following example:
+
+main()
+{
+OP a,b,c;
+anfang();
+a = callocobject(), b = callocobject(), c = callocobject();
+scan(BRUCH,a); scan(BRUCH,b);
+mult(a,b,c); println(c);
+freeall(a); freeall(b); freeall(c);
+ende();
+}
+
+First you allocate space for the empty object, this is done
+three times. Then you
+scan two fractions (BRUCH objects). After this, the fractions are
+multiplied and the result of that is printed out.  Now, if 
+you simply substitute BRUCH by POLYNOM, you can do the same
+for two polynomials. This is because the standard routines can
+handle general objects. At the end you free the memory allocated 
+for the three objects. 
+
+This documentation is seperated into three parts, first a 
+description of the different kind of objects, then 
+a description of the different kinds of standard routines, and
+as the last part we give some examples, a guide for the 
+installation and a list of all routines.
+

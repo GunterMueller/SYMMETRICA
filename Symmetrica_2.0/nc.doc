@@ -1,0 +1,342 @@
+COMMENT:
+NEW CHARACTER
+
+
+This is the datastructure to implement arbitrary group characters.
+For this datastructure  we have a label which contains information
+on the group, this is called group label.  (gl for short)
+The second part of the data structure is the information for the
+character, this is a VECTOR object whose i-th entry is the value
+of the charcter on the i-th class of the group.
+The same datastructure is used for the decomposition of a arbitray
+character into irreducibls, then the i-th entry gives the multiplicity
+of the i-th irreducible character.
+
+Group labels
+------------
+
+NAME:			
+	m_gl_sym
+SYNOPSIS:		
+	INT m_gl_sym(OP degree, kl)
+DESCRIPTION:    	
+	you input the degree of a symmetric group, this should
+	be a INTEGER object, the output is the object, which represents
+	the group label of the symmetric group of the given degree.
+
+NAME:		
+	m_gl_alt
+SYNOPSIS:	
+	INT m_gl_alt(OP degree, kl)
+DESCRIPTION:    
+	you input the degree of a alternating group, this should
+	be a INTEGER object, the output is the object, which represents
+	the group label of the alternating group of the given degree.
+
+NAME:		
+	m_gl_cyclic
+SYNOPSIS:	
+	INT m_gl_cyclic(OP degree, kl)
+DESCRIPTION:    
+	you input the degree of a cyclic group, this should
+	be a INTEGER object, the output is the object, which represents
+	the group label of the cyclic group of the given degree.
+
+
+NAME:		
+	m_gl_hyp
+SYNOPSIS:	
+	INT m_gl_hyp(OP degree, kl)
+DESCRIPTION:    
+	you input the degree of a hyperoctaeder group, this should
+	be a INTEGER object, the output is the object, which represents
+	the group label of the hyperoctaeder group of the given degree.
+	This is a special case of the routine m_gl_symkranz
+
+NAME:		
+	m_gl_symkranz
+SYNOPSIS:	
+	INT m_gl_symkranz(OP a,b, kl)
+DESCRIPTION:    
+	you input the degree of two symmetric groups, these should
+	be a INTEGER object, the output is the object, which represents
+	the group label of the wreath product s_a wr s_b of the
+	two symmetric groups of the given degree a and b.
+
+
+COMMENT:
+If we have a group label there are many routines which use the group label
+as input
+
+NAME:		
+	m_gl_go
+SYNOPSIS:	
+	INT m_gl_go(OP gl, order)
+DESCRIPTION:	
+	you input a group label, and the output is the orderof
+	the corresponding group.
+EXAMPLE:	
+	computes the order of the alternating group
+	....
+	scan(INTEGER,a);
+	m_gl_alt(a,b);
+	m_gl_go(b,c); println(c);
+	....
+
+COMMENT:
+It is also possible to run through the group:
+
+NAME:		
+	m_gl_first
+SYNOPSIS:	
+	INT m_gl_first(OP a,b)
+DESCRIPTION:	
+	computes the first element in the corresponding group
+	The first element is in most cases the identity.
+
+COMMENT:
+using this first element you can compute the next one:
+
+NAME:		
+	m_gl_next
+SYNOPSIS:	
+	INT m_gl_next(OP a,b,c)
+DESCRIPTION:	
+	computes the next element in the corresponding group
+	a ist the group label, b is a element, and c becomes the next one.
+	If b is already the last one the return value is FALSE, else it
+	is TRUE.  b and c may be the same object.
+
+EXAMPLE: 
+	computes the number of elements in a alternating group, using the
+	above routines:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c,d;
+	anfang();
+	a=callocobject(); b=callocobject(); c=callocobject(); d=callocobject(); 
+	scan(INTEGER,a); m_gl_alt(a,b);
+	m_gl_first(b,c); println(c);
+	m_i_i(1L,d);
+	while( m_gl_next(b,c,c) )  inc(d);
+	println(d); println(c);
+
+	freeall(a); freeall(b); freeall(c); freeall(d); 
+	ende();
+	}
+
+COMMENT:
+Table of irreducible characters
+-------------------------------
+
+NAME:		
+	m_gl_chartafel
+SYNOPSIS:	
+	INT m_gl_chartafel(gl,t)
+DESCRIPTION:	
+	you enter an object gl, which you got using a routine
+	to construct a group label (see above), the output is the
+	table of irreducible characters of the group, represented by
+	the group label.
+EXAMPLE:
+
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c,d;
+	anfang();
+	a=callocobject(); b=callocobject(); 
+	c=callocobject(); d=callocobject(); 
+
+	scan(INTEGER,a);
+	m_gl_sym(a,b); m_gl_chartafel(b,c); println(c);
+	m_gl_alt(a,b); m_gl_chartafel(b,c); println(c);
+	scan(INTEGER,d);
+	m_gl_symkranz(a,d,b); m_gl_chartafel(b,c); println(c);
+
+	freeall(a); freeall(b); freeall(c); freeall(d);
+	ende();
+	}
+
+COMMENT:
+Class labels
+------------
+
+If you have computed the character table, you also need information
+about the labelings of the classes, to know what is the charactervalue
+for what class.
+
+NAME:		
+	m_gl_cl
+SYNOPSIS:	
+	INT m_gl_cl(OP gl,cl)
+DESCRIPTION:	
+	you input a group label gl, and the output is a
+	VECTOR object of the length "number of classes", and the 
+	entries are objects which allows a labeling of classes, e.g
+	PARTITION objects in the case of the symmetric group.'
+EXAMPLE:
+
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c,d;
+	anfang();
+	a=callocobject(); b=callocobject(); 
+	c=callocobject(); d=callocobject(); 
+
+	scan(INTEGER,a);
+	m_gl_sym(a,b); m_gl_cl(b,c); println(c);
+	m_gl_alt(a,b); m_gl_cl(b,c); println(c);
+	m_gl_hyp(a,b); m_gl_cl(b,c); println(c);
+	scan(INTEGER,d);
+	m_gl_symkranz(a,d,b); m_gl_cl(b,c); println(c);
+
+	freeall(a); freeall(b); freeall(c); freeall(d);
+	ende();
+	}
+
+COMMENT:
+Class reps
+----------
+simliar to the above routine, we comput now representing
+elements for the classes and not a labeling
+
+NAME:		
+	m_gl_cr      
+SYNOPSIS:	
+	INT m_gl_cr(OP gl,cr)
+DESCRIPTION:	
+	you input a group label gl, and the output is a
+	VECTOR object of the length "number of classes", and the 
+	entries are objects which are representing elements of the
+	classes, in our examples up to now always permutations.
+	The sequence of the classes is the same as in the routine
+	m_gl_cl.
+
+COMMENT:
+Class order
+-----------
+
+NAME:		
+	m_gl_co
+SYNOPSIS:	
+	INT m_gl_co(OP gl,co)
+DESCRIPTION:	
+	you input the group label gl, and the output is a
+	VECTOR object of the length "number of classes", and the
+	entries give the order of the classes.
+	The sequence of the classes is the same as in the routine
+	m_gl_cl.
+
+
+
+COMMENT:
+Irreducible Character labels
+----------------------------
+If you have computed the character table, you also need information
+about the labelings of the classes, to know what is the charactervalue
+for what class.
+
+NAME:		
+	m_gl_il
+SYNOPSIS:	
+	INT m_gl_il(OP gl,il)
+DESCRIPTION:	
+	you input a group label gl, and the output is a
+	VECTOR object of the length "number of classes", and the 
+	entries are objects which allows a labeling of the 
+	irreducible characters, e.g
+	PARTITION objects in the case of the symmetric group.
+
+COMMENT:
+Irreducible Characters
+----------------------
+
+If you have a valid group label you can get a irreducible character
+of the given group.
+
+NAME:		
+	m_gl_nc
+SYNOPSIS:	
+	INT m_gl_nc(OP gl, il, nc)
+DESCRIPTION:	
+	you input the group label gl to specify the group, then
+	an object il which may be an INTEGER object, to say that you want
+	the i-th character, and the output will be in nc.
+	If the object il is not an INTEGER object it may be an 
+	object which labels characters in the entered group, e.g.
+	partitions for the symmetric group. You get these objects
+	with a previous call of m_gl_il.
+	You will get an error for example if the INTEGER object label
+	is to big , this means you entered a number which is bigger
+	then the number of classes.
+EXAMPLE: 
+	computes all irreducible characters of A_n
+	.....
+	scan(INTEGER,a);
+	m_gl_alt(a,b);
+	m_gl_il(b,c); println(c);
+	for (i=0L;i<S_V_LI(c);i++)
+		{
+		m_gl_nc(b,S_V_I(c,i),d);println(d);
+		}
+	.....
+
+NAME:		
+	scalarproduct_nc
+SYNOPSIS:	
+	INT scalarproduct_nc(OP nca,ncb,res)
+DESCRIPTION:	
+	you enter two characters of the same group, nca and ncb
+	the output is the result of the scalarproduct. To get the
+	characters you may use m_gl_nc or scan_gl_nc
+EXAMPLE:	
+	here we compute first all irreducible characters of A_n
+	afterwards we compute two scalarproducts, the first giving
+	0 and the second giving 1.
+
+	....
+	scan(INTEGER,a);
+	m_gl_alt(a,b);
+	m_gl_il(b,c); println(c);
+	m_il_v(S_V_LI(c),e);
+	for (i=0L;i<S_V_LI(c);i++)
+		m_gl_nc(b,S_V_I(c,i),S_V_I(e,i));println(S_V_I(e,i));
+
+	scalarproduct_nc(S_V_I(e,1L),S_V_I(e,0L),d); println(d);
+	scalarproduct_nc(S_V_I(e,0L),S_V_I(e,0L),d); println(d);
+	....
+
+NAME:		
+	reduce_nc
+SYNOPSIS:	
+	INT reduce_nc(OP ch, dec)
+DESCRIPTION:	
+	input is a character ch, and the output is a decomposition
+	into irrdeucible characters, the format of the input and output is
+	the same, as input you have at the i-th component the value on the
+	i-th class, in the output you have at the i-th component the 
+	multiplicity of the i-th irreducible character.
+
+NAME:		
+	scan_gl_nc
+SYNOPSIS:	
+	INT scan_gl_nc(OP gl,nc)
+DESCRIPTION:	
+	here we interactivly ask for a character of the group
+	specified by the grouplabel. The routine outputs the label of the
+	class, and reads the value on the class.
+EXAMPLE:
+	....
+	scan(INTEGER,a);
+	m_gl_alt(a,b);
+	scan_gl_nc(b,c);
+	reduce_nc(c,d); println(d);
+	....

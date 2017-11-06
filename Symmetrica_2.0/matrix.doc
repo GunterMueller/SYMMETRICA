@@ -1,0 +1,231 @@
+COMMENT:
+	MATRIX
+	------
+
+	This is the data structure for MATRIX objects.
+	It has three components:
+	the length, the height and the selfpart.
+
+	routine          macro         description
+	----------------------------------------------------------------
+
+	s_m_s            S_M_S         select_matrix_self
+	s_m_h            S_M_H         select_matrix_height
+	s_m_hi           S_M_HI        select_matrix_height as INT
+	s_m_l            S_M_L         select_matrix_length
+	s_m_li           S_M_LI        select_matrix_length as INT
+	s_m_ij           S_M_IJ        select_matrix_i,j_element
+	s_m_iji          S_M_IJI       select_matrix_i,j_element as INT
+	c_m_s            C_M_S         change_matrix_self
+	c_m_h            C_M_H         change_matrix_height
+	c_m_l            C_M_L         change_matrix_length
+	b_lhs_m                        build_length_height_self_matrix
+	b_lh_m                         build_length_height_matrix
+	m_lh_m                         make_length_height_matrix
+	m_ilih_m                       make_integerlength_integerlength_
+				       matrix
+	b_lh_nm                        build_length_height_null_matrix
+	m_lh_nm                        make_length_height_null_matrix
+	m_ilih_nm                      make_integerlength_integerlength_
+				       null_matrix
+
+	the last three routines initialize the matrix with zero entries
+	The routine s_m_ij differs from S_M_IJ because in the macro
+	S_M_IJ there is no check on the indices.
+
+	BASIC ROUTINES
+	--------------
+
+NAME:	     
+	s_m_h
+SYNOPSIS:    
+	OP s_m_h(OP mat)
+MACRO:
+	S_M_H
+DESCRIPTION: 
+	the parameter must be a MATRIX object, the return 
+	value is the height of the matrix, i.e. the INTEGER object 
+	which tells how many rows are in the MATRIX object. 
+
+NAME:	     
+	s_m_l
+SYNOPSIS:    
+	OP s_m_l(OP mat)
+MACRO:
+	S_M_L
+DESCRIPTION: 
+	the parameter must be a MATRIX object, the return 
+	value is the length of the matrix, i.e. the INTEGER object 
+	which tells how many rows are in the MATRIX object. 
+
+
+COMMENT:
+
+COMMENT:
+GENERAL ROUTINES FOR MATRICES
+-----------------------------
+
+NAME:       
+	change_column_ij
+SYNOPSIS:   
+	INT change_column_ij(OP mat, INT i,j)
+DESCRIPTION:  
+	interchanges in the MATRIX object 
+        mat the columns i,j.
+
+NAME:       
+	change_row_ij
+SYNOPSIS:   
+	INT change_row_ij(OP mat, INT i,j)
+DESCRIPTION:  
+	interchanges in the MATRIX
+        object mat the rows i,j.
+
+NAME:       
+	delete_column_matrix
+SYNOPSIS:   
+	INT delete_column_matrix(OP mat, INT i, OP result)
+DESCRIPTION:  
+	deletes in the MATRIX object mat the column i. 
+     The result is the MATRIX object result. mat and result may be the
+     same object.
+
+NAME:      
+	 delete_row_matrix
+SYNOPSIS:   
+	INT delete_row_matrix(OP mat, INT i, OP result)
+DESCRIPTION:  
+	deletes in the MATRIX object mat the row i. The
+     result is the MATRIX object result. mat and result may be the
+     same object.
+
+NAME:       
+	det_mat_imm 
+SYNOPSIS:   
+	INT det_mat_imm(OP mat,erg)
+DESCRIPTION: 
+	computes the determinant of the MATRIX mat, it uses the
+     definition as an alternating sum. You should use it if
+     there is no div opertion defined for the entries. e. g. 
+     POLYNOM objects as entries.
+
+
+
+NAME:       
+	det_mat_tri
+SYNOPSIS:   
+	INT det_mat_tri(OP mat,erg)
+DESCRIPTION: 
+	computes the determinant of the MATRIX mat, it uses the
+    the trinagulation of the matrix, so you must be careful with non
+    scalar entries, which allow no divison.
+
+NAME:       
+	pfaffian_matrix
+SYNOPSIS:   
+	INT pfaffian_matrix(OP mat,res)
+DESCRIPTION: 
+	computes the pfaffian of the MATRIX object mat. The result 
+	is stored in res. It is not necessary that the matrix is
+	skewsymmetric, but only the parts of the upper triangular part
+	of the matrix are used.
+
+NAME:       
+	immanente_matrix
+SYNOPSIS:   
+	INT immanente_matrix(OP mat,part,res)
+DESCRIPTION: 
+	computes the immanente labeled by the PARTITION object
+    part of the MATRIX object mat. The result is stored in res.
+
+
+NAME:      
+	 kronecker_product
+SYNOPSIS: 
+	  INT kronecker_product(OP a,b,c)
+DESCRIPTION:
+		computes the kronecker product of two MATRIX objects.
+	the three parameter may be equal. The result is the object c.
+
+
+NAME:
+			rank
+SYNOPSIS:	
+	INT rank(OP a,b)
+DESCRIPTION:
+		computes the rank of a matrix, it only works if it
+	possible to apply the function div to the entries of the
+	MATRIX object a
+
+
+NAME:  
+	     spalten_summe
+SYNOPSIS:
+	   INT spalten_summe(OP mat,res)
+DESCRIPTION:
+	 computes the sum of columns, the result is a VECTOR object
+    whose length is the number of columns
+
+NAME:	   
+	 select_row
+SYNOPSIS: 
+	  INT select_row(OP mat, INT i, OP vec)
+DESCRIPTION: 
+	transforms a MATRIX object into a VECTOR object, which contains
+	the elements of the labeled row
+
+
+NAME:	   
+	 select_column
+SYNOPSIS: 
+	  INT select_column(OP mat, INT i, OP vec)
+DESCRIPTION: 
+	transforms a MATRIX object into a VECTOR object, which contains
+	the elements of the labeled column
+
+
+NAME:       
+	test_matrix
+SYNOPSIS:  
+	 INT test_matrix()
+DESCRIPTION: 
+	to test the installation of the MATRIX objects
+
+NAME:       
+	scan_skewsymmetric_matrix
+SYNOPSIS:   
+	INT scan_skewsymmetric_matrix(OP mat)
+DESCRIPTION: 
+	to enter a MATRIX object, which is skew symmetric,
+	so you enter only the upper triangular part.
+
+COMMENT:
+	GENERAL ROUTINES
+	----------------
+
+	add()
+	add_apply()
+	comp()
+	copy()
+	einsp()
+	fprint()
+	fprintln()
+	freeall()
+	freeself()
+	inc()                          appends a new column to the right and a
+				       new row at the bottom
+	invers()
+	max()                          computes the maximum entry
+	mod()				applied to all entries of the matrix
+	mult()
+	mult_apply()
+	nullp()
+	objectread()
+	objectwrite()
+	print()
+	println()
+	quadraticp()                   test if quadratic matrix
+	scan()
+	tex()
+	trace()                        trace of the matrix
+	transpose()

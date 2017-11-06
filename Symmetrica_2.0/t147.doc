@@ -1,0 +1,190 @@
+Die folgenden Funktionen stellen eine Arithmetik fuer endliche Koerper in 
+Normalbasenrepraesentation dar. Sie wurde mit Hilfe trace-kompatibler
+Polynome implementiert, die Alfreed Scheerhorn vom IBM Scientific Center in
+Heidelberg bereitgestellt hat. 
+Um mit diesen Funktionen arbeiten zu koennen werden die Dateien 
+
+       trace_02.pol       trace_03.pol       trace_05.pol
+       trace_07.pol       trace_11.pol       trace_13.pol
+
+benoetigt die fuer die jeweilige Charakteristik die trace-kompatiblen 
+Polynome vom Grad 1-100 enthalten.
+
+
+
+
+
+
+   Die Funktion erzmulttafel berechnet die Multiplikationstafel fuer die
+   Normalbasis. erzmulttafel wird automatisch durchgefuehrt, falls Addition oder
+   Multiplikation zweier Koerperelemente dies erfordern. Sie muss also nur dann
+   angesprochen werden, wenn explizit ein bestimmter Erweiterungsgrad gewuenscht
+   wird, d.h. wenn z.B. Koerperelemente zufaellig erzeugt werden sollen, die 
+   einen bestimmten Erweiterungsgrad haben.
+   erzmulttafel gibt 1 zurueck, falls die Erzeugung der Multiplikationstafel 
+   erfolgreich abgeschlossen wurde und 0 sonst.
+   
+INT erzmulttafel(Erweiterungsgrad)
+INT Erweiterungsgrad; 
+
+
+
+
+   Die Funktion UE_Platz stellt ein undefiniertes Koerperelement bereit.   
+
+UE_Platz(Koerperzeiger)
+INT **Koerperzeiger;
+
+
+
+   Mit der Funktion UE_scan werden Koerperelemente eingelesen.
+
+UE_scan(Koerperzeiger)
+INT **Koerperzeiger;
+
+
+
+   Die Funktion UE_Zeige gibt ein Koerperelement auf dem Bildschirm aus. 
+
+INT UE_Zeige(Koerperzeiger)
+INT **Koerperzeiger;
+
+
+
+
+  Die Funktion UE_fZeige gibt ein Koerperelement auf das File f aus.  
+
+INT UE_fZeige(f,Koerperzeiger)
+FILE *f;
+INT **Koerperzeiger;
+
+
+
+   Die Funktion minimalErw bettet ein gegebenes Element in den Koerper kleinsten
+   Erweiterungsgrades ein, in dem es enthalten ist.
+
+minimalErw(Element)
+INT **Element;
+
+
+
+   Die Funktion UE_add berechnet die Summe von Summ1zeig und Summ2zeig und 
+   gibt das Ergebnis dieser Summe auf Ergebniszeig aus.   
+   Der Zeiger Ergebzeig darf dabei nicht auf dasselbe Koerperelement zeigen,
+   wie Summ1zeig oder Summ2zeig.
+
+UE_add(Summ1zeig,Summ2zeig,Ergebzeig)
+INT **Summ1zeig;
+INT **Summ2zeig;
+INT **Ergebzeig;
+
+
+
+
+   Die Funktion UE_mult berechnet das Produkt von Fakt1zeig und Fakt2zeig und 
+   gibt das Ergebnis dieses Produktes auf Ergebniszeig aus.   
+   Der Zeiger Ergebnzeig darf dabei nicht auf dasselbe Koerperelement zeigen,
+   wie Fakt1zeig oder Fakt2zeig.
+
+UE_mult(Fakt1zeig,Fakt2zeig,Ergebzeig)
+INT **Fakt1zeig;
+INT **Fakt2zeig;
+INT **Ergebzeig;
+
+
+
+   Die Funktion negativ berechnet das additive Inverse von Element und gibt 
+   -Element auf Ergebnis aus.
+   Der Zeiger Ergebnis darf dabei nicht auf dasselbe Koerperelement zeigen,
+   wie Element.
+
+negativ(Element,Ergebnis) 
+INT **Element,**Ergebnis;
+
+
+
+
+   Die Funktion UE_hoch berechnet die m-te Potenz von Element und gibt 
+   Element^m auf Ergebnis.
+   Der Zeiger Ergebnis darf dabei nicht auf dasselbe Koerperelement zeigen,
+   wie Element.
+
+UE_hoch(Element,m,Ergebnis) 
+INT **Element;
+INT m;
+INT **Ergebnis;
+
+
+
+   Die Funktion invers berechnet das multiplikative Inverse zu Element und gibt
+   1/Element auf Ergebnis aus.
+   Der Zeiger Ergebnis darf dabei nicht auf dasselbe Koerperelement zeigen,
+   wie Element.
+
+UE_invers(Element,Ergebnis) 
+INT **Element,**Ergebnis;
+
+
+
+   Die Funktion ist_null ueberprueft, ob Element dem neutralem Element der 
+   additiven Gruppe des aktuellen Koerpers entspricht. ist_null gibt 1 zurueck,
+   falls dies gilt und 0 sonst.
+
+INT ist_null(Element)
+INT **Element;
+
+
+
+
+   Die Funktion ist_eins ueberprueft, ob Element dem neutralem Element der 
+   multiplikativen Gruppe des aktuellen Koerpers entspricht. ist_eins gibt 1 
+   zurueck falls dies gilt und 0 sonst.
+
+INT ist_eins(Element)
+INT **Element;
+
+
+
+
+   Die Funktion Int_Aequivalent berechnet die a-fache Summe des 1-Elementes im
+   Grundkoerper und belegt das Koerperelement Ergebnis mit dieser Summe.  
+
+Int_Aequivalent(a,Ergebnis)
+INT a;
+INT **Ergebnis;
+
+
+
+
+
+   Die Funktion ist_gleich vergleicht die Koerperelemente Element1 und
+   Element2. Dazu werden die Koeffizienten von Element1 und Element2 bezueglich
+   der Normalbasis ihres gemeinsammen Erweiterungskoerpers von links nach rechts
+   verglichen. Die erste Stelle in der sie sich unterscheiden ist 
+   ausschlaggebend.
+   ist_gleich gibt  1 zurueck, falls Element1 > Element2,
+                   -1        , falls Element1 < Element2, und
+                    0        , falls Element1 = Element2.
+
+INT ist_gleich(Element1,Element2)
+INT **Element1;
+INT **Element2;
+
+
+
+
+   Die Funktion Order berechnet die kleinste Zahl m, fuer die Element^m = 1 
+   gilt. Order gibt diese Zahl m zurueck.
+
+int Order(Element)
+int **Element;
+
+
+
+
+   Die Funktion UE_Random erzeugt ein zufaelliges Koerperelement aus dem Koerper
+   mit der aktuellen Koerpererweiterung. Das Ergebnis wird auf Element 
+   ausgegeben.
+
+UE_Random(Element)
+INT **Element;

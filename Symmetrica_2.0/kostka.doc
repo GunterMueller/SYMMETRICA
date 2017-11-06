@@ -1,0 +1,130 @@
+COMMENT:
+	KOSTKA
+	------
+
+NAME:       
+	allkostka
+SYNOPSIS:   
+	INT allkostka(OP n)
+DESCRIPTION: 
+	print all kostka tables up to the INTEGER object n
+
+
+NAME:       
+	kostka_number
+SYNOPSIS:   
+	INT kostka_number(OP content,shape,result)
+DESCRIPTION: 
+	computes the kostkanumber, i.e. the number of
+         tableaux of given shape, which is a PARTITION object, and
+         of given content, which also is a PARTITION object, or a VECTOR
+	object with INTEGER entries. The
+         result is an INTEGER object, which is freed to an empty
+         object at the beginning. The shape could also be a
+         SKEWPARTITION object, then we compute the number of 
+         skewtableaux of the given shape.
+BUGS:  
+	      The result is limited to INTEGER objects
+
+
+NAME:  
+	     kostka_tab
+SYNOPSIS:
+	   INT kostka_tab(OP shape, content, result)
+DESCRIPTION: 
+	computes the list of tableaux of given shape
+        and content. shape is a PARTITION object or a 
+        SKEWPARTITION object and
+        content is a PARTITION object or a VECTOR object with
+	INTEGER entries, the result becomes a
+        LIST object whose entries are the computed TABLEAUX
+	object.
+BUG:    
+	content should also be allowed to be a VECTOR object
+        of INTEGERS.
+	call to kostka_number and kostka_tab have different syntax
+RETURN: 
+	OK or ERROR
+
+EXAMPLE:
+	look at the following example, which computes all tableaux of
+	given shape and content, stores them in a file and reads this
+	 back from the file, and prints them
+
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c,d;
+	FILE *fp1,*fp2;
+	anfang();
+
+	a=callocobject(); b=callocobject(); c=callocobject(); d=callocobject(); 
+
+	fp1=fopen("xxx","w");
+	scan(PARTITION,a); scan(PARTITION,d); kostka_tab(a,d,b);
+	objectwrite(fp1,b);fclose(fp1);
+	fp2=fopen("xxx","r");
+	objectread(fp2,c); println(c);
+
+	freeall(a); freeall(b); freeall(c); freeall(d);
+
+	ende();
+	}
+
+NAME:       
+	kostka_tafel
+SYNOPSIS:   
+	INT kostka_tafel(OP n, result)
+DESCRIPTION: 
+	computes the kostka table for the weight n , the
+       result is a matrix in the object result.
+
+NAME:       
+	make_n_transpositionmatrix
+SYNOPSIS:   
+	INT make_n_transpositionmatrix(OP dim,mat)
+DESCRIPTION: 
+	computes the transpositions matrix of given
+       weight dim, the result is a MATRIX object mat, where the
+       entries are INTEGER objects 0 or 1. The rows and columns
+       are labeled by the partitions of the weight dim, and a
+       1 is the entry if and olny if the row index equals the
+       conjugate of the column index.
+
+NAME:  
+	     stirling_second_number
+SYNOPSIS:
+	   INT stirling_second_number(OP n,k,result)
+DESCRIPTION: 
+	computes the Stirling number of the second kind,
+	i.e. the number of possibilities to fill n pieces into
+        k boxes. The input must be two INTEGER objects n,k.
+BUGS:  
+	      Very slow function, because it uses the scalar
+	product of rows of the kostka table.
+
+
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c;
+	anfang();
+	a= callocobject(); b= callocobject(); c= callocobject();
+	scan(INTEGER,a); scan(INTEGER,b);
+	stirling_second_number(a,b,c);println(c);
+	freeall(a);freeall(b); freeall(c);
+	ende();
+	}
+
+
+NAME:       
+	test_kostka
+SYNOPSIS:   
+	INT test_kostka()
+DESCRIPTION: 
+	tests the implementation of the kostka routines
+

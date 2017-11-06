@@ -1,0 +1,673 @@
+COMMENT:
+	NUMERIC STANDARD ROUTINES
+	-------------------------
+
+
+
+NAME:           
+	absolute
+SYNOPSIS:      
+	INT absolute(OP in, out)
+DESCRIPTION:    
+	computes the absolute value, it works for
+       BRUCH,INTEGER,LONGINT,MATRIX, VECTOR  objects.
+BUGS:       
+	The variables in and out must be different. It doesnt
+       work for SQ_RADICAL and CYCLOTOMIC
+
+
+
+NAME:           
+	add
+SYNOPSIS:       
+	INT add(OP a,b,c)
+DESCRIPTION:    
+	adds the objects a and b and the result is c
+	It also works with a,b,c not different. First there is a 
+        check whether a or b is an empty object, if yes the 
+        second one is copied to the first one, and the routine 
+        finishes. Then the result object c is freed. 
+        Then there is a call to the specific add routine for the 
+        entered objects.
+        It work for the following kinds:
+        MONOPOLY, CYCLOTOMIC, SQ_RADICAL, GEN_CHAR, INTEGER,
+        PARTITION, GRAL, POLYNOM, MONOM, VECTOR, SCHUR, LONGINT,
+        MATRIX, KRANZTYPUS, HOM_SYM, SCHUBERT, SYMCHAR, BRUCH, 
+	REIHE, FINITEFIELD
+RETURN:         
+	OK or ERROR
+BUGS:          
+	 not all possible combinations are implemented
+        If you enter for example add(a,a,a) with a a POLYNOM
+        object, there is first a copy then an addition,
+        even if a merge would be faster. In this case you should use
+	add_apply
+
+
+
+NAME:           
+	add_apply
+SYNOPSIS:       
+	INT add_apply(OP a,b)
+DESCRIPTION:    
+	add a to b, a and b may be equal. It works 
+	for the following types
+	BRUCH, GRAL, INTEGER, LONGINT, MATRIX, KRANZTYPUS, 
+	SCHUBERT, SCHUR, SYMCHAR, MONOPOLY, CYCLOTOMIC, 
+	SQ_RADICAL, POLYNOM, VECTOR, FINITEFIELD, REIHE
+RETURN:     
+	OK or ERROR
+BUGS:   
+	not all combinations are working
+
+
+NAME:           
+	addinvers
+SYNOPSIS:       
+	INT addinvers(OP a,b)
+DESCRIPTION:    
+	b becomes the additive inverse of the
+	object a. a and b may be equal. b is freed first
+        It work for the following kind of objects:
+	BRUCH, CYCLOTOMIC, HOM_SYM, FINITEFIELD,
+	INTEGER, LONGINT, MONOM
+        MONOPOLY, GRAL, POLYNOM, SCHUBERT, SCHUR, SQ_RADICAL,
+        SYMCHAR, VECTOR
+	cf. also addinvers_apply
+RETURN:
+	         OK or ERROR
+BUGS:  
+	         if a and b are equal we make no use of it
+	May be some types are missing e.g. MATRIX
+
+
+NAME:     
+	      addinvers_apply
+SYNOPSIS: 
+	      INT addinvers_apply(OP a)
+DESCRIPTION: 
+	   a is changed to the additve invers of a, this 
+	works for the following types:
+	BRUCH CYCLOTOMIC ELM_SYM FINITEFIELD 
+	HOM_SYM INTEGER LONGINT MONOM
+	GRAL POLYNOM SCHUR SQ_RADICAL SYMCHAR VECTOR
+RETURN: 
+	    OK or ERROR
+
+
+NAME:  
+	         binom
+SYNOPSIS:
+	       INT binom(OP a,b,c)
+DESCRIPTION:
+	    c becomes the binomial coefficient "a choose b" 
+	It also works for negative values for oben. The varaibles
+        a b c may be equal. b must be >= 0. c is freed first.
+	The object a may INTEGER or POLYNOM. The object b must
+	be INTEGER.
+BUGS:  
+	          It works only for INTEGER objects. Not for 
+	LONGINT
+
+
+
+
+NAME: 
+	          conjugate
+SYNOPSIS:
+	       INT conjugate(OP in, out)
+DESCRIPTION:
+	 computes the conjugate partition, it works for
+	PARTITION and SKEWPARTITION.
+	the variables in and out may be equal. In the case of
+        a wrong input you gat an error message. The variable out is freed
+        before the computation.
+	It also works for SCHUR and the other symmetric functions, here it
+	is applied to the partitions labeling one summand.
+	Other symmetric functions are: HOM_SYM, ELM_SYM, POW_SYM, MONOMIAL
+RETURN:
+	         OK or ERROR in the case of an error
+BUGS:  
+	         should work for CYCLOTOMIC, 
+	also for GRAL and PERMUTATION and MATRIX (but different parameters)
+EXAMPLE:
+	......
+        a = callocobject();
+	b = callocobject();
+	scan(PARTITION,a);
+	conjugate(a,b);
+	println(b);
+	......	
+
+
+
+NAME:
+	           dec
+SYNOPSIS:
+	       INT dec(OP a)
+DESCRIPTION:
+	    decrease a by one, if a is INTEGER or
+	LONGINT. In the case of a VECTOR, PERMUTATION,
+	PARTITION, the last element is discarded.
+RETURN:
+	         OK or ERROR
+
+
+NAME:
+	           det
+SYNOPSIS: 
+	      INT det(a,b)
+DESCRIPTION:
+	    computes the determinant of the MATRIX a. a may also
+	be of type KRANZTYPUS. a and b may be equal, b is freed first.
+BUGS:  
+	      it uses an algorithm with triangulisation, so it works
+	only for entries which allow the routine div.
+	To avoid this algorithm use det_mat_imm
+
+
+
+NAME:   
+	        dimension
+SYNOPSIS:
+	       INT dimension(OP label, result)
+DESCRIPTION: 
+	Computes the dimension of the representation of the symmetric
+	group labeled by the input. It works for the following input
+	objects: PARTITION, SCHUR, SKEWPARTITION, AUGPART, SCHUBERT.
+	label and result may be equal. result is freed first
+RETURN:
+	        OK or ERROR
+
+
+NAME: 
+	          div
+SYNOPSIS:
+	       INT div(a,b,c)
+DESCRIPTION:
+	    computes c = a/b. It is exact division, it
+	means that the division of to INTEGERS or LONGINTS
+	gives a BRUCH object. If you want to avoid this use
+	ganzdiv. The routine uses invers and mult, so it 
+	works for all objects which have invers and mutl
+	defined.
+RETURN:
+	          OK or ERROR
+
+
+NAME: 
+	          fakul
+SYNOPSIS:
+	       INT fakul(OP a,b)
+DESCRIPTION: 
+	   b becomes a!. a is an INTEGER object. a must
+	be >= 0.  a and b may be equal. b is freed first.
+BUGS:  
+	         LONGINT should be possible for a.
+RETURN: 
+	        OK or ERROR
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP b,h2;
+	anfang();
+	b=callocobject(); h2=callocobject(); 
+	scan(INTEGER,h2); fakul(h2,b); println(b);
+	freeall(b); freeall(h2);
+	ende();
+	}
+
+
+NAME:
+	           ganzdiv
+SYNOPSIS:
+	       INT ganzdiv(a,b,c)
+DESCRIPTION:
+    computes the integer part of the division a / b.
+	it works for INTEGER and LONGINT a and b. The varaibles
+        a b c may be equal. c is freed first. You must be careful
+	if you have a negativ object a. you compute the next smaller
+	INTEGER, so a=-5, b=2 ==> c=-3. comprae this with INT quores().
+RETURN: 
+    OK or ERROR
+BUGS:
+       sometimes you have POLYNOM etc. objects, which are
+        integers, but you can not use this routine.
+	e.g. the POLYNOM 4 [0,0,0] is the INTEGER object 4.
+
+
+NAME:
+	           ganzsquareroot
+SYNOPSIS: 
+	      INT ganzsquareroot(a,b)
+DESCRIPTION: 
+	   computes the integer part of the squareroot of the
+         input object a. The result is in b, which is freed first.
+         It works for INTEGER objects a.
+         The variables a and may be equal.
+BUGS:  
+	          It doesnt work for LONGINT objects.
+RETURN:
+	         OK or ERROR.
+
+
+NAME: 
+	          ggt
+SYNOPSIS: 
+	      INT ggt(a,b,c)
+DESCRIPTION:
+	    computes the gcd of a and b the result is c.
+	The variables a b c may be equal. c is freed first.
+	The routine works for all objects which allow
+	absolute, posp, comp, mod, addinvers, negp
+	so it works only for INTEGER and LONGINT
+RETURN:
+	         OK or ERROR
+BUGS:  
+	     POLYNOM would be useful
+
+
+
+NAME:
+	           hoch
+SYNOPSIS:
+	       INT hoch(OP basis,exponent,result)
+DESCRIPTION: 
+	   computes basis^exponent to result. result is
+	freed to an empty object first. The variables basis
+	exponent and result may be equal. Following
+	types are allowed
+	exponent:     INTEGER
+ 	              LONGINT
+	basis:        all types, which can be multiplied using
+		mult_apply
+	The input variables may be equal. The exponent may be a negative
+	value.
+RETURN:
+	         OK if no error
+	ERROR else.
+
+
+NAME: 
+	          inc
+SYNOPSIS:
+	       INT inc(OP a)
+DESCRIPTION: 
+	   increase a by one, if a is INTEGER or
+	LONGINT. In the case of VECTOR an empty object is appended.
+	The same in the case of PARTITION object. In the case of an
+	PERMUTATION object, there will be inserted  a leading
+        fixpoint. In the case of MATRIX or KRANZTYPUS object there
+	will be a further column and a further row at the ends, with
+        empty objects. In the case of REIHE it computes the next
+	coefficent.
+RETURN:
+	       OK or ERROR
+BUGS:  
+	       may be also useful for BRUCH, SQ_RADICAL, CYCLOTOMIC
+	(addition of 1)
+
+
+NAME:   
+	        inhalt
+SYNOPSIS: 
+	      INT inhalt(OP a,b)
+DESCRIPTION:   
+	 computes the content of a TABLEAUX or a WORD object. 
+	The content must be INTEGER object >= 1. First b ist
+	freed. a and b may be equal. b becomes a VECTOR object
+RETURN:
+			OK or ERROR
+
+
+
+NAME: 
+	          invers
+SYNOPSIS:
+	       INT invers(OP a,b)
+DESCRIPTION:
+	    computes the multiplicative inverse of the
+	object a. It works for BRUCH, CYCLOTOMIC,
+	INTEGER, FINITEFIELD, LONGINT, MATRIX, KOSTKA, KRANZTYPUS,
+        PERMUTATION, SQ_RADICAL.
+	a nd b may be equal. b is freed first.
+RETURN:
+	         OK or ERROR
+
+
+
+NAME:  
+	         invers_apply
+SYNOPSIS: 
+	      INT invers_apply(OP a)
+DESCRIPTION:  
+	  changes a to its multiplicative inverse. It works
+	for INTEGER, in all other cases it calls invers.
+RETURN:
+	         OK or ERROR
+BUGS:  
+	         more types should be implemented.
+
+
+NAME:   
+	        kgv
+SYNOPSIS:
+	       INT kgv(a,b,c)
+DESCRIPTION: 
+	   computes the lcm of the input objects a and b.
+         The result is stored in c. The routine needed ar ggt
+         mult and div
+RETURN:
+	         OK or ERROR
+
+
+NAME:  
+	         lehmercode
+SYNOPSIS:
+	       INT lehmercode(OP a,b)
+DESCRIPTION:
+	    computes the lehmercode of the object a. a may
+	be a PERMUTATION object or an VECTOR object. The
+        VECTOR object must contain INTEGER objects. the variables
+        a and b may be equal. b is freed first.
+RETURN:
+	   OK or ERROR
+BUGS:  
+	   there is no test on INTEGER objects in the VECTOR objects.
+	lehmercode for barred permutations is missing
+
+
+
+NAME:  
+	         length
+SYNOPSIS:
+	       INT length(OP a,b)
+DESCRIPTION: 
+	   computes the length of LIST type objects or
+	VECTOR type objects. So it works for the following 
+        types
+	GRAL HOM_SYM LIST POLYNOM MONOPOLY SCHUBERT SCHUR 
+	PARTITION PERMUTATION  SKEWPARTITION VECTOR WORD
+        COMP
+	a and b may be equal.
+BUGS:  
+			It doesnt work for SQ_RADICAL CYCLOTOMIC
+RETURN:	
+		OK if there is no error, else != OK
+
+
+NAME: 
+	          max
+SYNOPSIS:
+	       INT max(OP a,b)
+DESCRIPTION: 
+	   b becomes a copy of the maximum object in a.
+	It works for MATRIX,VECTOR,WORD objects. If we have the
+	wrong type it prints an error message
+RETURN:
+	         OK or ERROR
+BUGS:  
+	 the variables a and b must be different. The routine does not
+        work for LIST, BINTREE
+        It would be useful to enter a function for comparision.
+        It would be useful to have a routine min
+
+
+NAME:  
+	         mod  
+SYNOPSIS:
+	       INT mod(OP a,b,c) 
+DESCRIPTION:
+	 Computes a mod b, where a,b could be out of INTEGER or
+	LONGINT. The result is always positive,
+	12 mod 5 = 2
+	-12 mod 5 = 3
+	12 mod -5 = 2
+        -12 mod -5 = 3
+	The variables a b c may be equal, c is freed first
+	The routine also works if the first parameter is a MATRIX
+	object and the second parameter is a INTEGER object, in this
+	case the routine is applied to all entries of the matrix.
+RETURN:
+			ERROR if b is 0
+BUGS:  
+	   MONOPOLY and POLYNOM would be useful
+
+
+
+
+NAME:	
+		moebius
+SYNOPSIS:
+		INT moebius(OP a,b)
+DESCRIPTION:
+		computes the number theoretic moebius function of
+	the input object a.
+
+
+
+
+NAME:   
+        mult
+SYNOPSIS:  
+	     INT mult(OP a,b,c) 
+DESCRIPTION:
+	    it multiplies the two objects a and b and the result will
+	be in c. First there is a check whether a,b,c not NULL then 
+        whether a and b are no empty objects. Then it frees the object c.
+	Now it multiplies. It is not necessary, that a,b,c are different.
+	See also mult_apply();
+	Multiplies two objects, and the result is a new object. Look
+	at the following list of possible datatypes.
+	BRUCH,CYCLOTOMIC,GRAL,FINITEFIELD, HOM_SYM,
+	INTEGER,KRANZTYPUS,KOSTKA,LONGINT,MATRIX,MONOPOLY
+	PERMUTATION,POLYNOM,SCHUR,SCHUBERT,REIHE
+	SYMCHAR,SQ_RADICAL,VECTOR.
+RETURN:
+	         OK or ERROR
+BUGS:  
+	 many combinations are missing
+EXAMPLE:
+	main() {
+	OP a = callocobject();
+	OP b = callocobject();
+	scan(POLYNOM,a);
+	scan(BRUCH,b);
+	mult(a,b,b); println(b);
+	freeall(a);
+	freeall(b);
+	}
+	This example multiplies a BRUCHobject and a POLYNOMobject, which 
+	gives a POLYNOMobject with BRUCHobjects as coefficients.
+
+
+NAME:
+	           mult_apply
+SYNOPSIS:
+	       INT mult_apply(OP a,b)
+DESCRIPTION:
+	    mult a to b, at the moment this works for the following
+	types of a: BRUCH GRAL INTEGER LONGINT MONOPOLY CYCLOTOMIC 
+	REIHE
+	MATRIX POLYNOM REIHE SCHUBERT SCHUR SQ_RADICAL SYMCHAR
+	SQ_RADICAL VECTOR. 
+	a and b may be equal
+RETURN:
+	       OK or ERROR
+BUGS:  
+	       not all combinations are implemented
+
+
+
+NAME:
+			multinom
+SYNOPSIS:
+		INT multinom(OP a,b,c)
+DESCRIPTION:
+		missing
+
+
+
+NAME: 
+	          qdimension
+SYNOPSIS:
+	       INT qdimension(OP label, result)
+DESCRIPTION:
+	 Computes the qdimension of the representation of the symmetric
+	group labeled by the input. It works for the following input
+	objects: SCHUBERT.
+	label and result may be equal. result is freed first
+RETURN:
+	        OK or ERROR
+
+
+NAME:
+	           quores
+SYNOPSIS: 
+	      INT quores(OP a,b,c,d)
+DESCRIPTION:
+	    c becomes the result of the integer division a by b.
+	d becomes the result of a mod b
+	types of a,b: INTEGER
+		      LONGINT
+	c and d must be different, the remaining varaibales may be
+	equal. c and d are freed first.
+BUGS:  
+	         POLYNOM, MONOPOLY would be useful
+
+
+NAME:       
+	    scalarproduct
+SYNOPSIS: 
+	      INT scalarproduct(OP a,b,c)
+DESCRIPTION:
+	    c becomes the scalarproduct of a and b. This works
+	for VECTOR objects, where it is the euklidean and for
+	SYMCHAR objects, where it is the scalarproduct of two 
+	characters of the symmetric group.  It works also for
+	SCHUR objects.
+	a b c may be equal, c is freed first.
+BUGS:  
+	   The scalarproduct of vector, works only for
+	reell entries, not for CYCLOTOMIC
+
+
+NAME: 
+	          signum
+SYNOPSIS:
+	       INT signum(OP a,b)
+DESCRIPTION:
+	   b becomes the signum of the PERMUTATION object a.
+        b is freed first.
+BUGS:  
+	         a and b must be different
+
+
+NAME:
+	           sort
+SYNOPSIS:
+	       INT sort(OP a)
+DESCRIPTION:
+	    the VECTOR object a is sorted by comp().
+RETURN:
+	         OK or ERROR
+BUGS:  
+	         should work also for LIST and BINTREE
+      it should be possible to specify the comp - function
+      As for CYCLOTOMIC and SQ_RADICAL we do not have comp 
+      you will get problems with such entries.
+
+
+NAME:  
+	         squareroot
+SYNOPSIS:
+	       INT squareroot(OP a,b)
+DESCRIPTION: 
+	   b becomes the squareroot of a. It works for
+       INTEGER, LONGINT, BRUCH. If the input is not quadratic
+       the output is a object of type SQ_RADICAL. 
+       The variables a and b may be equal.
+RETURN:
+	         OK or ERROR
+
+
+
+NAME:    
+	       sub
+SYNOPSIS:
+	       INT sub(OP a,b,c)
+DESCRIPTION:
+	    c = a - b 
+	computes the difference of two objects, it first calls
+	the routine addinvers, then the routine add, so it is limited
+	two the objects which can be handled by these two routines.
+	The input varaibles may be equal.
+	There is a check on errors during the computation.
+RETURN:
+	          OK or ERROR
+
+
+
+NAME:  
+	         sum
+SYNOPSIS:  
+	     INT sum(OP a,b)
+DESCRIPTION:
+	    b becomes the sum of the VECTOR object a. It must
+         be possible to add the entries. a and b may be equal. b
+         is freed first. It also works for COMP objects.
+RETURN:
+	         OK or ERROR
+BUGS:  
+	         it would be good to have the same for LIST and
+         BINTREE objects.
+
+
+NAME:
+	           trace
+SYNOPSIS:
+	       INT trace(OP a,b)
+DESCRIPTION:
+	    a is a MATRIX object. So also the type KRANZTYPUS
+	works for a. a and b may be equal. b is freed first.
+	b becomes the sum over the diagonal elements of the matrix.
+RETURN:
+	        OK or ERROR
+
+
+NAME: 
+	          transpose
+SYNOPSIS: 
+	      INT transpose(OP a,b)
+DESCRIPTION:
+	    computes the transpose of a MATRIX object a.
+        It also works for KOSTKA and KRANZTYPUS, which are also MATRIX
+        objects. The variable a and b may be equal.
+RETURN:
+	         OK or ERROR
+
+
+NAME:
+	           vander
+SYNOPSIS: 
+	      INT vander(OP a,b)
+DESCRIPTION: 
+	   a is a INTEGER object, and b becomes the 
+	POLYNOM object, which is the determinant of the 
+	vandermonde matrix. Only reasonable for small 
+	values of a.
+BUGS:  
+	   a and b must be different. Slow algorithm.
+
+
+NAME:
+	           weight
+SYNOPSIS:
+	       INT weight(OP a,b)
+DESCRIPTION:
+	    b becomes the wheight of a. This works
+	a of type AUG_PART,PARTITION, SKEWPARTITION, TABLEAUX.
+	a and b may be equal variables. b is freed first

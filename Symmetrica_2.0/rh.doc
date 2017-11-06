@@ -1,0 +1,146 @@
+COMMENT:
+	/* rh.doc SYMMETRICA */
+
+NAME:		
+	is_scalar_reihe
+SYNOPSIS:	
+	INT is_scalar_reihe(OP a)
+DESCRIPTION:	
+	checks wether a is a object of the kind REIHE with
+		only constant term.
+
+NAME:		
+	max_degree_reihe
+SYNOPSIS:	
+	INT max_degree_reihe(OP a,b)
+DESCRIPTION:	
+	you enter a REIHE object a, and the output is the
+	degree of maximal coefficent, which is computed up to now.
+
+
+NAME:		
+	m_function_reihe
+SYNOPSIS:	
+	INT m_function_reihe(INT (*f)(); OP a);
+DESCRIPTION:	
+	you enter a function f, which computes an coefficent
+	of the series, which is specified by an paramter of the function.
+	The result is a object a of type REIHE. The syntax of the function
+	f is described now in detail:
+		INT f(OP a,b) 
+	a is a INTEGER object which gives the common degree of the 
+	coefficents, which should be computed. The result b must be of
+	the type POLYNOM object. This POLYNOM object is homogenous of
+	the entered degree. 
+EXAMPLE:	
+	the following routine computes the series
+	
+	sum over all partitions, entered in exponent notation
+
+	#include "def.h"
+	#include "macro.h"
+
+	INT co_part(a,b) OP a,b;
+	{
+	if (S_I_I(a) == 0L)
+		m_iindex_iexponent_monom(0L,0L,b);
+	else
+		{
+		OP c = callocobject();
+		OP d;
+		INT i;
+		makevectorofpart(a,c);
+		init(POLYNOM,b);
+		
+		for (i=0;i<S_V_LI(c);i++)
+			{
+			d = callocobject();
+			m_s_po(S_PA_S(S_V_I(c,i)),d);
+			insert(d,b,NULL,NULL);
+			}
+		freeall(c);
+		}
+	return OK;
+	}
+
+	main()
+	{
+	OP a;
+	anfang();
+	a = callocobject();
+	m_function_reihe(co_part,a); println(a);
+	freeall(a);
+	ende();
+	}
+		
+	
+NAME:		
+	random_reihe
+SYNOPSIS:	
+	INT random_reihe(OP a)
+DESCRIPTION:	
+	builds a one-parameter series with random INTEGER
+	coefficents.
+
+
+NAME:		
+	scan_reihe
+SYNOPSIS:	
+	scan_reihe(OP a)
+DESCRIPTION:	
+	this is the function which is called by scan if you
+	enter the type REIHE. Up to now you can only select between
+	a fixed number of special series.
+
+NAME:		
+	select_coeff_reihe
+SYNOPSIS:	
+	INT select_coeff_reihe(OP a,b,c)
+DESCRIPTION:	
+	you enter a REIHE object a, and an VECTOR object b, which must
+	have INTEGER entries, this integer vector is treated as an 
+	exponent vector,
+	the output is the coefficent which is the object c. This is a copy
+	of the coefficent in the series. 
+
+NAME:		
+	select_degree_reihe
+SYNOPSIS:	
+	INT select_degree_reihe(OP a,b,c)
+DESCRIPTION:	
+	you enter a REIHE object a, and an INTEGER object b.
+	The output are the entries of the series a, which have the given
+	degree b. In most cases the output is a POLYNOM object c. 
+
+
+NAME:		
+	t_REIHE_POLYNOM
+SYNOPSIS:	
+	INT t_REIHE_POLYNOM(OP a,b)
+DESCRIPTION:
+
+
+
+
+
+COMMENT:
+	standard routines
+	-----------------
+
+	add
+	add_apply
+	addinvers
+	comp		lexicographic comparision
+	fprint
+	fprintln
+	freeall
+	freeself
+	hoch
+	length		number of computed entries in the series not equal zero
+	mult
+	mult_apply
+	objectread	MISSING
+	objectwrite	MISSING
+	print
+	println
+	scan		you only can enter fixed series

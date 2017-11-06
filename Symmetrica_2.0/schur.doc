@@ -1,0 +1,558 @@
+COMMENT:
+	SCHUR
+	-----
+
+
+	In general an object of the type SCHUR is a special LIST object.
+	The self components of the LIST are MONOM objects. And the
+	self part of the MONOM object are PARTITION objects.
+	(Look at the documentation on PARTITION and LIST)
+
+	If we want to build a SCHUR object, we need three parts
+	the PARTITION object, called self, the next part, which is the
+	next entry in the list, which is NULL at the end, or a 
+	SCHUR object, with a bigger PARTITION, and the coefficent,
+	which is of arbitray type.
+
+	To access and change the parts of a SCHUR object we have
+	the following routines
+
+	routine     macro       description             type if posible
+	----------------------------------------------------------------
+	s_s_s       S_S_S       select_schur_self       PARTITION
+	s_s_n       S_S_N       select_schur_next       SCHUR or NULL
+	s_s_k       S_S_K       select_schur_koeff      arbitrary
+	s_s_si      S_S_SI      select_schur_self_ith   INTEGER
+	s_s_sl      S_S_SL      select_schur_self_length     INTEGER
+	s_s_sii     S_S_SII     select_schur_self_ith_int    INT
+	s_s_sli     S_S_SLI     select_schur_self_length_int INT
+
+	There are also other object types for the different bases of
+	algebra of symmetric functions. They are also a list of
+	monoms with partition as the self part. the names are
+		POW_SYM		symmetric powersum
+		HOM_SYM		complete homogenous symmetric functions
+		MONOMIAL	momomial symmetric functions
+		ELM_SYM		elementary symmetric functions
+	to access parts of it you use the select-functions (macros) as
+	for the schur functions.
+
+	To build a new SCHUR object we have the routine build_..
+	and the routine make_.., which differ in the handling of
+	the inputs, make does a copy and build does no copy.
+
+NAME:      
+	b_skn_s
+SYNOPSIS:  
+	INT b_skn_s(OP self,koeff,next,result)
+DESCRIPTION:  
+	first the result is freed to an empty object,
+     if it is not yet an empty object. Then the SCHUR
+     object is build out of the components, given as arguments.
+     in m_skn_s the components are copied, so you may use
+     them in the further programm, in b_skn_s they become
+     part of result, so using them may destroy the SCHUR
+     object.
+
+NAME:      
+           m_skn_s
+SYNOPSIS:  
+           INT m_skn_s(OP self,koeff,next,result)
+DESCRIPTION:  
+	first the result is freed to an empty object,
+     if it is not yet an empty object. Then the SCHUR
+     object is build out of the components, given as arguments.
+     in m_skn_s the components are copied, so you may use
+     them in the further programm, in b_skn_s they become
+     part of result, so using them may destroy the SCHUR
+     object.
+
+COMMENT:
+sometimes you have a PARTITION and you want to build a 
+SCHUR object out of it
+
+NAME:      
+	b_pa_s     
+SYNOPSIS:  
+	INT b_pa_s(OP part,result)
+DESCRIPTION: 
+	you call b_skn_s  with self==part
+      koeff is one and next==NULL.
+
+NAME:      
+           m_pa_s    
+SYNOPSIS:  
+           INT m_pa_s(OP part,result)
+DESCRIPTION: 
+	you call m_skn_s with self==part
+      koeff is one and next==NULL.
+
+COMMENT:
+and sometimes you even have a VECTOR object of INTEGER object,
+which you want to sort to a PARTITION object, and then you
+want to build a SCHUR object out of it
+
+NAME:      
+	m_v_s
+SYNOPSIS:  
+	INT m_v_s(OP vec, result)
+DESCRIPTION: 
+      you enter a VECTOR object vec, which must be an VECTOR of INTEGER. 
+	The INTEGERs are not allowd to be negative. Look at m_v_pa(). These 
+	are sorted and  build a PARTITION which labeles the resulting SCHUR object
+	result. In b_v_s the VECTOR object will be part of the resulting OBJECT
+	in m_v_s a copy of the input will be part of the result.
+
+NAME:      
+	b_v_s
+SYNOPSIS:  
+	INT b_v_s(OP vec, result)
+DESCRIPTION: 
+      you enter a VECTOR object vec, which must be an VECTOR of INTEGER. 
+	The INTEGERs are not allowd to be negative. Look at m_v_pa(). These 
+	are sorted and  build a PARTITION which labeles the resulting SCHUR object
+	result. In b_v_s the VECTOR object will be part of the resulting OBJECT
+	in m_v_s a copy of the input will be part of the result.
+
+COMMENT:
+sometimes you want to build a Schur function representing an
+scalar, i.e. the Schur function labeled by the zero partition,
+for this you have
+
+NAME:		
+	m_scalar_schur
+SYNOPSIS:	
+	INT m_scalar_schur(OP scal, schur)
+DESCRIPTION:	
+	this results in a SCHUR object schur, which
+	consits of one monomial whose self part is a partition
+	of length one with entry zero and a coeff part, which 
+	is the object scal.
+
+NAME:      
+	dimension_schur
+SYNOPSIS:  
+	INT dimension_schur(OP a,b)
+DESCRIPTION: 
+	you enter a SCHUR object a, and the result is the
+	dimension of the corresponding representation of the
+	symmetric group sn.
+
+
+NAME:      
+	schnitt_schur
+SYNOPSIS:  
+	INT schnitt_schur(OP a,b,c)
+DESCRIPTION: 
+	you enter two SCHUR objects, and the result is the
+	common part.
+
+
+NAME:      
+	outerproduct_schur
+SYNOPSIS:  
+	INT outerproduct_schur(OP parta,partb,result)
+DESCRIPTION: 
+	you enter two PARTITION objects, and the result is
+	a SCHUR object, which is the expansion of the product
+	of the two schurfunctions, labbeled by
+	the two PARTITION objects parta and partb.
+	Of course this can also be interpreted as the decomposition of the 
+	outer tensor product of two irreducibe representations of the
+	symmetric group.
+
+NAME:	   
+	part_part_skewschur
+SYNOPSIS:  
+	INT part_part_skewschur(OP big,small,result)
+DESCRIPTION:   
+	you enter two PARTITION objects big and small, where big is
+	a partition which contains small, and result becomes a SCHUR
+	object, which represents the decomposition of the corresponding
+	skew partition.
+
+
+NAME:      
+	newtrans
+SYNOPSIS:  
+	INT newtrans(OP perm, schur)
+DESCRIPTION: 
+	computes the decomposition of a schubertpolynomial labeled by 
+       the permutation perm, as a sum of Schurfunction.
+
+NAME:      
+	compute_schur_with_alphabet
+SYNOPSIS:  
+	INT compute_schur_with_alphabet(OP part,laenge,erg)
+DESCRIPTION: 
+	computes the expansion of a schurfunction labeled by a
+       partition PART as a POLYNOM erg. The INTEGER laenge specifies the
+       length of the alphabet.
+
+EXAMPLE:
+
+	#include "def.h"
+	#include "macro.h"
+
+	BEGIN
+	scan(PARTITION,a);
+	scan(INTEGER,b);
+	compute_schur_with_alphabet(a,b,c);println(c);
+	END
+
+
+NAME:      	
+	compute_homsym_with_alphabet
+SYNOPSIS:  	
+	INT compute_homsym_with_alphabet(OP number,laenge,erg)
+DESCRIPTION: 
+	computes the expansion of a homogenous(=complete) symmetric 
+       	function labeled by a INTEGER number as a POLYNOM erg.
+	The object number may also be a  PARTITION or a HOM_SYM object.
+       	The INTEGER laenge specifies the length of the alphabet.
+	Both routines are the same.
+EXAMPLE:	
+	we check whether the multiplication of POLYNOM objects
+	and HOM_SYM objects gives the same.
+
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c,d,e;
+	anfang();
+	a=callocobject(); b=callocobject(); c=callocobject(); 
+	d=callocobject(); e=callocobject(); 
+
+
+	scan(HOM_SYM,a); println(a);
+	scan(INTEGER,c); compute_homsym_with_alphabet(a,c,d);
+	println(d);
+	mult(a,a,b);
+	mult(d,d,e); println(b);
+	compute_homsym_with_alphabet(b,c,d);
+	println(d);
+	if (NEQ(d,e))
+		println(e);
+
+	freeall(a); freeall(d); freeall(e); freeall(b); freeall(c);
+	ende();
+	}
+
+NAME:      
+	compute_elmsym_with_alphabet
+SYNOPSIS:  
+	INT compute_elmsym_with_alphabet(OP label,laenge,erg)
+DESCRIPTION: 
+	computes the expansion of a elementary symmetric 
+	function labeled by a INTEGER label or by a PARTITION label
+	or a ELM_SYM label as a POLYNOM erg.
+       	The INTEGER laenge specifies the length of the alphabet.
+EXAMPLE: 
+	compares the multiplication of ELM_SYM and POLYNOM
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c,d,e;
+	anfang();
+
+	a=callocobject(); b=callocobject(); c=callocobject(); 
+	d=callocobject(); e=callocobject(); 
+
+	scan(ELM_SYM,a);
+	println(a);
+	scan(INTEGER,c);
+	compute_elmsym_with_alphabet(a,c,d); println(d);
+	mult(a,a,b); mult(d,d,e); println(b);
+	compute_elmsym_with_alphabet(b,c,d); println(d);
+	if (NEQ(d,e))
+		println(e);
+
+	freeall(a); freeall(d); freeall(e); freeall(b); freeall(c);
+	ende();
+	}
+
+NAME:      
+	compute_monomial_with_alphabet
+SYNOPSIS:  
+	INT compute_monomial_with_alphabet(OP number,laenge,erg)
+DESCRIPTION: 
+	computes the expansion of a monomial symmetric 
+       function labeled by a PARTITION number as a POLYNOM erg.
+       The INTEGER laenge specifies the length of the alphabet.
+
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{
+	OP a,b,c;
+	anfang();
+	a=callocobject(); b=callocobject(); c=callocobject();
+	scan(PARTITION,a); scan(INTEGER,b);
+	compute_monomial_with_alphabet(a,b,c); println(c);
+	freeall(a); freeall(b); freeall(c); 
+	ende();
+	}
+
+
+NAME:      
+           compute_power_with_alphabet
+SYNOPSIS:  
+           INT compute_power_with_alphabet(OP label,laenge,erg)
+DESCRIPTION: 
+	computes the expansion of a power symmetric 
+	function labeled by a INTEGER label or by a PARTITION label
+	or a POW_SYM label as a POLYNOM erg.
+       	The INTEGER laenge specifies the length of the alphabet.
+	another name for this routine is compute_powsym_with_alphabet().
+EXAMPLE: 
+	compares the multiplication of POW_SYM and POLYNOM
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c,d,e;
+	anfang();
+
+	a=callocobject(); b=callocobject(); c=callocobject(); 
+	d=callocobject(); e=callocobject(); 
+
+	scan(POW_SYM,a);
+	println(a);
+	scan(INTEGER,c);
+	compute_power_with_alphabet(a,c,d); println(d);
+	mult(a,a,b); mult(d,d,e); println(b);
+	compute_power_with_alphabet(b,c,d); println(d);
+	if (NEQ(d,e))
+		println(e);
+
+	freeall(a); freeall(d); freeall(e); freeall(b); freeall(c);
+	ende();
+	}
+
+NAME:      
+           compute_powsym_with_alphabet
+SYNOPSIS:  
+           INT compute_powsym_with_alphabet(OP label,laenge,erg)
+DESCRIPTION: 
+	computes the expansion of a power symmetric 
+	function labeled by a INTEGER label or by a PARTITION label
+	or a POW_SYM label as a POLYNOM erg.
+       	The INTEGER laenge specifies the length of the alphabet.
+	another name for this routine is compute_power_with_alphabet().
+EXAMPLE: 
+	compares the multiplication of POW_SYM and POLYNOM
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a,b,c,d,e;
+	anfang();
+
+	a=callocobject(); b=callocobject(); c=callocobject(); 
+	d=callocobject(); e=callocobject(); 
+
+	scan(POW_SYM,a);
+	println(a);
+	scan(INTEGER,c);
+	compute_powsym_with_alphabet(a,c,d); println(d);
+	mult(a,a,b); mult(d,d,e); println(b);
+	compute_powsym_with_alphabet(b,c,d); println(d);
+	if (NEQ(d,e))
+		println(e);
+
+	freeall(a); freeall(d); freeall(e); freeall(b); freeall(c);
+	ende();
+	}
+
+NAME:      
+	compute_schur_with_alphabet_det
+SYNOPSIS:  
+	INT compute_schur_with_alphabet_det(OP part,length,erg)
+DESCRIPTION: 
+	computes the expansion of a schurfunction labeled by the
+       PARTITION part, using the Jacobi Trudi Identity, the result is the
+       POLYNOM erg, the length of the alphabet is given by INTEGER length.
+
+
+NAME:      
+	compute_skewschur_with_alphabet_det
+SYNOPSIS:  
+	INT compute_skewschur_with_alphabet_det(OP skewpart,length,erg)
+DESCRIPTION: 
+	computes the expansion of a skewschurfunction labeled by the
+       SKEWPARTITION skewpart, using the Jacobi Trudi Identity, 
+       the result is the
+       POLYNOM erg, the length of the alphabet is given by INTEGER length.
+
+EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+
+	main()
+	{	
+		OP a = callocobject(), b = callocobject(), c = callocobject();
+		OP d = callocobject();
+		anfang();
+		scan(SKEWPARTITION,a);
+		scan(INTEGER,b);
+		compute_skewschur_with_alphabet_det(a,b,d);println(d);
+		freeall(a); freeall(d); freeall(b); freeall(c);
+		ende();
+	}
+
+COMMENT:
+Now there are several routines to change basis in the space of symmetric 
+functions:
+
+NAME:		
+	t_SCHUR_MONOMIAL
+SYNOPSIS:	
+	INT t_SCHUR_MONOMIAL(OP s,m)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+
+
+NAME:		
+		t_MONOMIAL_SCHUR
+SYNOPSIS:	
+		INT t_MONOMIAL_SCHUR(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+NAME:		
+		t_MONOMIAL_HOMSYM
+SYNOPSIS:	
+		INT t_MONOMIAL_HOMSYM(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+NAME:		
+		t_SCHUR_HOMSYM
+SYNOPSIS:	
+		INT t_SCHUR_HOMSYM(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+NAME:		
+		t_ELMSYM_SCHUR
+SYNOPSIS:	
+		INT t_ELMSYM_SCHUR(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+NAME:		
+		t_ELMSYM_MONOMIAL
+SYNOPSIS:	
+		INT t_ELMSYM_MONOMIAL(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+
+NAME:		
+		t_ELMSYM_HOMSYM
+SYNOPSIS:	
+		INT t_ELMSYM_HOMSYM(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+
+NAME:		
+		t_HOMSYM_SCHUR
+SYNOPSIS:	
+		INT t_HOMSYM_SCHUR(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+
+NAME:		
+		t_HOMSYM_MONOMIAL
+SYNOPSIS:	
+		INT t_HOMSYM_MONOMIAL(OP m,s)
+DESCRIPTION:	
+	you input an object of the first kind, i.e. in the case
+	of t_SCHUR_MONOMIAL an object of type SCHUR, and the output is the
+	same symmetric function written in the second basis, i.e. in the 
+	given case an object of the type MONOMIAL.
+BUG:		
+	up to now the two objects must be different
+
+
+NAME:      	
+	hall_littlewood
+SYNOPSIS:  	
+	INT  hall_littlewood(OP part, OP res)
+DESCRIPTION: 
+	computes the so called Hall Littlewood Polynomials, i.e.
+      a SCHUR object, whose coefficient are polynomials in one
+      variable. The method, which is used for the computation is described
+      in the paper: A.O. Morris The Characters of the group GL(n,q)
+      Math Zeitschr 81, 112-123 (1963)
+
+NAME:
+	compute_zonal_with_alphabet
+SYNOPSIS:
+	INT compute_zonal_with_alphabet(part,l,res) OP part,l,res;
+DESCRIPTION:
+	computes the zonal polynomial, a POLYNOM object, labeled by the
+	PARTITION object part, for the alphabet in l variables.
+
+COMMENT:
+
+General Routines
+---------------
+
+add
+add_apply
+addinvers
+addinvers_apply
+comp
+freeall
+freeself
+fprint
+fprintln
+mult
+mult_apply
+objectread
+objectwrite
+print
+println
+scalarproduct
+sub
+tex

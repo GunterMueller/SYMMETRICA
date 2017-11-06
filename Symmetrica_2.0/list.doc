@@ -1,0 +1,221 @@
+COMMENT:
+LIST
+
+This is a fundamental datatype of SYMMETRICA. A LIST object
+consists of two parts, the entry of the list, which
+is called the self-part, and the next-part of the list,
+which is again a LIST object. If the next-part is NULL,
+we are at the end of the list.
+
+To select parts of a LIST object we have standard macros and 
+routines:
+
+NAME                    MACRO              description
+----------------------------------------------------------------
+s_l_s                   S_L_S              select_list_self
+c_l_s                   C_L_S              change_list_self
+s_l_n                   S_L_N              select_list_next
+c_l_n                   C_L_N              change_list_next
+
+For the construction of a LIST object there are
+m_sn_l and b_sn_l, whose description follows.
+
+NAME:          
+                 b_sn_l
+SYNOPSIS:       
+                 INT b_sn_l(OP self,next,result)
+DESCRIPTION:     constructs a new LIST object using 
+      build (using the parameters as partsof the result). 
+	If the parameters are NULL
+      than there is no difference between b_sn_l and m_sn_l.
+      First it frees the memory of result, if result is not
+      the empty object.
+RETURN:          
+	ERROR if no space for the new LIST object.
+
+
+NAME:          
+                 m_sn_l
+SYNOPSIS:       
+                 INT m_sn_l(OP self,next,result)
+DESCRIPTION:     constructs a new LIST object using 
+      make (using copies of the parameters). If the parameters are NULL
+      than there is no difference between b_sn_l and m_sn_l.
+      First it frees the memory of result, if result is not
+      the empty object.
+RETURN:          
+	ERROR if no space for the new LIST object.
+      OK else.
+
+
+
+COMMENT:
+Using the standard initialisation init(LIST,newobject)
+we produce an empty list, this means self==NULL and next==NULL.
+For a check whether we have an empty list or not there is
+a boolean function
+
+NAME:            
+	empty_listp
+SYNOPSIS:        
+	INT empty_listp (OP list)
+DESCRIPTION:     
+	test whether we have a empty list
+RETURN:          
+	FALSE if not a LIST type object.
+      FALSE if not a empty list (self != NULL)
+      TRUE  if a empty list
+
+COMMENT:
+	If you have a list, the fundamental operation is insertion 
+	into the list. So there are two steps, first the generation
+	of a empty LIST object, and then the insertion into a list.
+	For the first step you simply call the
+	standard routine init(); Look:
+	.
+	.
+	.
+	OP l = callocobject();
+	init(LIST,l);
+	println(l);
+	.
+	.
+
+	This prints the message
+	empty list
+	on the terminal. The typical operation is the insertion 
+	of a new object into a list. This is done using the routine
+	insert
+
+NAME:         
+	insert_list
+SYNOPSIS:     
+	INT insert_list(OP element, list
+                       INT (* eqhandle)(), (* compfunction)() )
+DESCRIPTION:  
+	inserts the element into the LIST object list. 
+	The second parameter list must be a LIST object. 
+	There is no test, whether
+        it is a LIST object. This routine is called by the 
+        general routine insert(), which has the same syntax.
+	compfunction is the function for the comparision of
+        the element to insert and the objects, which are 
+        already in the list. The list is assumed to be ordered
+        in increasing order. The compfunction is called with two
+        arguments, the element and s_l_s(actual position). 
+        The return value is <0 , 0 , >0  like the standard 
+        routine comp(). The function eqhandle is called when
+        the element is already in the list. (i.e. comparsion
+        gives 0) It is called with two arguments the element
+        and  s_l_s(actual position).  If after the call of
+        eqhandle the entry in the list is the empty object,
+        it means that the entry was deleted, this entry is
+        removed from the list. (e.g. cancellation in a 
+        polynomial) 
+        In the case the first parameter element is a LIST object
+        this routine is a merge of two lists.
+        In general it is not good to delete an element
+        which was inserted into list, because this destroys 
+        the list, since it generates a hole in the list.
+
+	If you call insert with NULL for the two functionpointer, you 
+	use the standard comparsion comp(), and no insertion in the
+	case of comp()=0
+
+
+
+NAME:           
+	lastp_list
+SYNOPSIS:       
+	INT lastp_list(OP l)
+DESCRIPTION:    
+	true if next == NULL
+	a test whether we are at the end of a list
+
+
+
+NAME:           
+	test_list
+SYNOPSIS:       
+	INT test_list()
+DESCRIPTION:    
+	for checking of the installation
+
+
+NAME:           
+	t_BINTREE_LIST
+SYNOPSIS:       
+	INT t_BINTREE_LIST(OP bintree, OP list)
+DESCRIPTION:
+	to transform a BINTREE object into a LIST object
+
+
+
+NAME:           
+	t_LIST_VECTOR 
+SYNOPSIS:       
+	INT t_LIST_VECTOR(OP list,OP vector)
+DESCRIPTION:    
+	builds a VECTOR whose entries are copies
+	      of the entries of the LIST object.
+	The ordering is preserved
+	of course there is also the invers routine t_VECTOR_LIST, which
+	is documented in the file vc.doc
+
+
+NAME:		
+	filter_list
+SYNOPSIS:	
+	INT filter_list(OP oldlist, OP newlist; INT (*cf)())
+DESCRIPTION:	
+	the routine loops over the LIST object oldlist, and for
+	every self part of the list it calls the function cf, whose
+	single parameter is the self part. If this user provided
+	functions return TRUE the self part becomes a member of the
+	newly build LIST object newlist. If their is no part in the
+	new list the result is a empty object
+EXAMPLE:
+	INT co_22(a) OP a;
+	{
+	if (S_T_IJI(a,(INT)0,(INT)1) == (INT)2) return TRUE; 
+	return FALSE;
+	}
+	....
+	scan(PARTITION,a); scan(PARTITION,b);
+	kostka_tab(a,b,c); filter_list(c,d,co_22);
+	...
+
+	So you have a routine which does the check on the
+	list elements, so the reult is a list of TABLEAUX objects
+	where the entry 2 is on the first row.
+
+
+
+NAME:		
+	filter_list_apply
+SYNOPSIS:	
+	INT filter_list_apply(OP list; INT (*cf)())
+DESCRIPTION:	
+	the routine loops over the LIST object list, and 
+	cuts entries according to the same rules as the routine
+	filter_list does. The only difference is, that the
+	actual LIST object is changed.
+
+COMMENT:
+
+	GENERAL ROUTINES
+	----------------
+
+	comp()                                   lexicographic on entries
+	copy()
+	fprint()
+	fprintln()
+	freeall()
+	freeself()
+	length()                                 length of list
+	objectread()
+	objectwrite()
+	print()
+	println()
+	scan()
+	tex()

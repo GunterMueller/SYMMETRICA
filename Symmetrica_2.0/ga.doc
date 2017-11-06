@@ -1,0 +1,120 @@
+COMMENT:
+	GROUP ALGEBRA
+	-------------
+
+	This is a variant of the POLYNOM type, the name of this class
+	of objects is GRAL (for group algebra). The type of the self part
+	is a permutation instead of a vector as in the case of POLYNOM.
+	So a general object of type GRAL is a list of permutations with
+	arbitrary coefficents.
+	For the selection of parts you have to use the macros for polynom
+	objects (up to now)
+	There are two routines for the construction
+
+NAME:		
+		m_skn_gral
+SYNOPSIS:
+	INT m_skn_gral(OP self, OP koeff, OP next, OP res)
+DESCRIPTION: 	
+	same as  m_skn_po in the file poly.doc
+
+NAME:		
+		b_skn_gral
+SYNOPSIS:
+	INT b_skn_gral(OP self, OP koeff, OP next, OP res)
+DESCRIPTION: 	
+	same as  b_skn_po in the file poly.doc
+
+
+NAME:		
+	hplus_hecke
+SYNOPSIS:	
+	INT hplus_hecke(OP a,b)
+
+NAME:		
+	hplus
+SYNOPSIS:	
+	INT hplus(OP a,b)
+DESCRIPTION:	
+	computes the sum over all horizonatl permutation of a 
+	TABLEAUX object a. cf. Mueller: Darstellungstheorie
+	The result is a GRAL object.
+BUG:		
+	only for TABLEAUX of PARTITION shape
+
+NAME:		
+	vminus_hecke
+SYNOPSIS:	
+	INT vminus_hecke(OP a,b)
+
+NAME:		
+	vminus_tabloid
+SYNOPSIS:	
+	INT vminus_tabloid(OP a,b)
+
+NAME:		
+	vminus
+SYNOPSIS:	
+	INT vminus(OP a,b)
+DESCRIPTION:	
+	computes the signed sum over all vertical permutations of a 
+	TABLEAUX object a. cf. Mueller: Darstellungstheorie
+	The result is a GRAL object.
+BUG:		
+	only for TABLEAUX of PARTITION shape
+
+NAME:		
+	random_gral
+SYNOPSIS:	
+	INT random_gral(OP a,b)
+DESCRIPTION:	
+	computes a random element of the group algebra. The degree
+	of the involved permutations is given by the INTEGER object a. The
+	coefficents are INTEGER object given by random_integer, so they lay
+	between -10 and 10. There are maximal ten terms.
+
+NAME:		
+	operate_gral_polynom
+SYNOPSIS:	
+	INT operate_gral_polynom(OP a,b,c)
+DESCRIPTION:	
+	applies the element of the group algebra a to a 
+	POLYNOM b, and the result is a new POLYNOM c
+
+NAME:		
+	vertikal_sum
+SYNOPSIS:	
+	INT vertikal_sum(OP a,b)
+DESCRIPTION:	
+	computes the sum over all permutations of degree a, 
+	the result is the object b, a element of type GROUPALGEBRA
+
+NAME:		
+	garnir
+SYNOPSIS:	
+	INT garnir(OP tab,v,x,res)
+DESCRIPTION:	
+	cf. James/Kerber p.301, tab is a TABLEAUX object
+	v and x a VECTOR objects of INTEGERS containing entries of
+	different coulmns, the result is a GROUPALGEBRA object.
+
+COMMENT:
+	GENERAL ROUTINES
+	----------------
+
+	add
+	add_apply
+	addinvers
+	comp
+	copy
+	fprint
+	fprintln
+	freeall
+	freeself
+	mult
+	objectread
+	objectwrite
+	print
+	println
+	scan
+	tex

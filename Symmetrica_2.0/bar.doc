@@ -1,0 +1,154 @@
+COMMENT:
+	BARRED PERMUTATION
+	------------------
+
+	These are elements of group S_2 wreath S_n, the elements are
+	objects of the type PERMUTATION, but where the kind of the
+	permutation is BAR or BARCYCLE. 
+	The permutation is of length n, and the
+	entries are between 1 and n , but may be positiv or negativ.
+
+
+NAME:	
+	class_bar
+SYNOPSIS:
+	INT class_bar(OP a,b)
+DESCRIPTION:
+	computes the label of the conjugacy class of the
+	element a.
+
+NAME:	
+	class_rep_bar
+SYNOPSIS:
+	INT class_rep_bar(OP a,b)
+DESCRIPTION:
+	you enter the label of a class, and the routine computes
+	a element 'b' of that class
+
+NAME:
+		first_bar
+SYNOPSIS:
+	INT first_bar(OP a,b)
+DESCRIPTION:
+	computes the first barred permutation = [1,2,3..]
+	of degree a. a must be a INTEGER object.
+
+NAME:
+		lehmercode_bar
+SYNOPSIS:
+	INT lehmercode_bar(OP a,b)
+DESCRIPTION:
+    computes the lehmercode of a barred permutation a.
+	The result is a two-element VECTOR object, whose two entries
+	are INTEGER - VECTOR objects, whose length are the length of the
+	PERMUTATION object a.
+	The first VECTOR is a 0-1 vector, the i-th entry is one if the
+	element i+1 is negativ in the PERMUTATION object a.
+	The second VECTOR is the ordinary Lehmercode of a permutation, 
+	but taken into account that we have negative entries.
+EXAMPLE:
+	given the barred permutation
+	3 -5  2 -1 4
+		the result of lehmercode_bar is
+	[[1,0,0,0,1][3,0,1,0,0]]
+
+NAME:
+		lehmercode_vector_bar
+SYNOPSIS:
+	INT lehmercode_vector_bar(OP a,b)
+DESCRIPTION:
+	is the inverse routine to the above routine
+	lehmercode_bar
+
+NAME:	
+	length_bar
+SYNOPSIS:
+	INT length_bar(OP a,b)
+DESCRIPTION:
+	computes the reduced length of the barred permutation a.
+
+NAME:
+		makevectorof_class_bar
+SYNOPSIS:
+	INT makevectorof_class_bar(OP a,b)
+DESCRIPTION:
+	computes a vector with all labelings of the classes of
+	the group S_2 wreath S_a
+
+NAME:
+		makevectorof_class_rep_bar
+SYNOPSIS:
+	INT makevectorof_class_rep_bar(OP a,b)
+DESCRIPTION:
+	computes a vector with reps  of all the classes of
+	the group S_2 wreath S_a, the ordering of classes is as in the
+	function makevectorof_class_bar.
+
+NAME:	
+	mult_bar_bar
+SYNOPSIS:
+	INT mult_bar_bar(OP a,b,c)
+DESCRIPTION:
+	multiplies first b than a , the result becomes c. 
+	Better to use the general routine mult(OP,OP,OP)
+
+NAME:	
+		next_bar
+SYNOPSIS:
+		INT next_bar(OP a,b)
+DESCRIPTION
+	:	computes the next barred permutation b. The algorithm
+	uses the lehmercode. The last barred permutation will be
+	[-1,-2,-3,...]
+
+NAME:
+			ordcen_bar
+SYNOPSIS:
+		INT ordcen_bar(OP a,b)
+DESCRIPTION:
+		computes the order of the centralicer of the class 
+	labeled by 'a'.
+
+NAME:
+			ordcon_bar
+SYNOPSIS:
+		INT ordcon_bar(OP a,b)
+DESCRIPTION:
+		computes the order of the  class labeled by 'a'.
+
+NAME:
+			random_bar
+SYNOPSIS:
+		INT random_bar(OP a,b)
+DESCRIPTION:
+		computes a random element of given length, so b becomes
+	an elements of S_2 wreath S_a, a is an INTEGER object.
+
+NAME:
+			scan_bar
+SYNOPSIS:
+		INT scan_bar(OP a)
+DESCRIPTION:
+		reads a barred permutation from input, and checks
+	wether the input was correct. You may better use the routine
+	scan(BARPERM,a).
+
+NAME:
+			t_BAR_BARCYCLE
+SYNOPSIS:
+		INT t_BAR_BARCYCLE(OP a,b);
+DESCRIPTION:
+		transforms a barred permutation 'a' in list-notation into
+	cycle notation
+BUG:
+			a and b must be different
+
+NAME:
+			t_BARCYCLE_BAR
+SYNOPSIS:
+		INT t_BARCYCLE_BAR(OP a,b);
+DESCRIPTION:
+		transforms a barred permutation 'a' in cycle-notation into
+	list notation
+BUG:
+			a and b must be different

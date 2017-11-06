@@ -1,0 +1,605 @@
+COMMENT:
+#################################################################
+VECTOR
+#################################################################
+
+This is a basic objecttype of SYMMETRICA. A VECTOR object consists
+of two parts. A part, which is a INTEGER object, the
+length of the vector, and a second part, which is an array
+of objects. Let us first look at the construction of a
+VECTOR object. Look at the following program
+
+	EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a;
+	anfang();
+	a = callocobject();
+	m_il_v(8L,a);
+	println(a);
+	freeall(a);
+	ende();
+	}
+
+The routine m_il_v() builds an VECTOR object with eight empty objects.
+The output will be
+
+[#,#,#,#,#,#,#,#]
+
+The complete description follows
+
+NAME:         
+	m_il_v
+SYNOPSIS:    
+	 INT m_il_v(INT length; OP vectorobject)
+DESCRIPTION:  
+	builds an vector of the given length. First there is
+	a check whether vectorobject is a empty object, if this
+        is not the case it is freed.
+	Moreover, there is the allocation of the given number of 
+        objects, which are set to empty objects.
+RETURN:
+		      the returnvalue is OK, ERROR if some error occured, e.g.
+	not enough memory for the objects.
+MACRO: 
+	       there is a macro M_IL_V, which is the same without any
+	checks.
+
+
+COMMENT:
+There is the routine/macro b_il_v/B_IL_V which is the same. 
+There is also the routine, where you enter an INTEGER object, and you
+will get a VECTOR object with such length.
+.
+.
+.
+scan(INTEGER,a);
+b_l_v(a,b);
+println(b);
+.
+.
+.
+Here the INTEGER object a becomes the length part of the VECTOR object b, 
+so if you delete the VECTOR object using freeall(), or freeself(), you
+can no longer access the INTEGER object a, because it was freed as part
+of the VECTOR object b. If you want to avoid this, you must the 
+make-construktor, which does a copy:
+.
+.
+.
+scan(INTEGER,a);
+m_l_v(a,b);
+println(b);
+.
+.
+.
+Here you can free the VECTOR object b, and you have still an INTEGER object
+a. This method is easier for you, but you need more
+memory for data. Now we are ready for 
+the complete description of these two routines
+
+NAME:
+              b_l_v 
+SYNOPSIS:     
+              INT b_l_v(OP length, vectorobject)
+DESCRIPTION: 
+	 builds an vector of the given length. First there is
+	a check whether vectorobject is a empty object, if not it is freed.
+	Then there is a check whether length is an INTEGER object.
+	Then there is the allocation of the given number of objects, which
+	are set to empty objects. Using b_l_v length will be the
+	length part of the VECTOR object. Using m_l_v a copy of the
+	INTEGER object length will be the length part of the VECTOR object.
+RETURN:
+		      the returnvalue is OK, ERROR if some error occured, e.g.
+	not enough memory for the objects.
+
+NAME:  	
+       m_l_v 
+SYNOPSIS:     
+	INT m_l_v(OP length, vectorobject)
+DESCRIPTION: 
+	 builds an vector of the given length. First there is
+	a check whether vectorobject is a empty object, if not it is freed.
+	Then there is a check whether length is an INTEGER object.
+	Then there is the allocation of the given number of objects, which
+	are set to empty objects. Using b_l_v length will be the
+	length part of the VECTOR object. Using m_l_v a copy of the
+	INTEGER object length will be the length part of the VECTOR object.
+RETURN:
+		      the returnvalue is OK, ERROR if some error occured, e.g.
+	not enough memory for the objects.
+
+COMMENT:
+There are the special cases, where you have one object and you 
+want to build a vector, whose single component is this object:
+
+NAME:
+              b_o_v 
+SYNOPSIS:     
+              INT b_o_v(OP object,vector)
+DESCRIPTION:
+	  builds an vector of length one, whose entry is the
+        object. The object is copied in m_o_v, is not copied in
+        b_o_v. The vector is first freed to an empty object.
+	In the routine m_o_v the two parameters may be equal, in
+	b_o_v they must be different
+RETURN:
+	       the returnvalue is OK, ERROR if some ERROR occured.
+
+
+NAME:
+         m_o_v  
+SYNOPSIS:     
+	INT m_o_v(OP object,vector)
+DESCRIPTION:
+	  builds an vector of length one, whose entry is the
+        object. The object is copied in m_o_v, is not copied in
+        b_o_v. The vector is first freed to an empty object.
+	In the routine m_o_v the two parameters may be equal, in
+	b_o_v they must be different
+RETURN:
+	       the returnvalue is OK, ERROR if some ERROR occured.
+
+COMMENT:
+These are the routines for the construction of VECTOR objects, now we
+come to routines for the selection of parts. The following program
+uses these routines
+
+	EXAMPLE:
+	#include "def.h"
+	#include "macro.h"
+	main()
+	{
+	OP a;
+	anfang();
+	a = callocobject();
+	m_il_v(8L,a);
+	m_i_i(5L,s_v_i(a,3L));
+	println(s_v_i(a,2L));
+	println(s_v_l(a));
+	printf("%ld\n",s_v_li(a)+3L);
+	freeall(a);
+	ende();
+	}
+
+The routine s_v_i(), selects the i_th object of the vector, the routine
+s_v_l() selects the length of a VECTOR object, and as you know that this
+an INTEGER object you can access the INTvalue of the length with s_v_li().
+So the output of the above programm, will be the following three lines
+
+#
+8
+11
+
+There are also routines, which allow you to access the pointer to the array
+of objects, this is the routine s_v_s(), and if you know that the entries
+of the VECTOR object are INTEGER objects you can access their INTvalues using
+s_v_ii(). Here is the complete description:
+
+NAME:         
+	s_v_l           select_vectorobject_length
+              s_v_li          select_vectorobject_lengthinteger
+SYNOPSIS:
+	     OP s_v_l(OP vectorobject)
+              INT s_v_li(OP vectorobject)
+DESCRIPTION:
+	  selects the length of an VECTOR object. There is first a 
+	check whether it is really an VECTOR object. There is also a 
+	check whether the length is a not negative number.
+RETURN:
+		      s_v_l gives the length part of the VECTOR object, this is
+	an INTEGER object, it is not a copy of the length part.
+	s_v_li gives the INTvalue of the length part. It is equivalent
+	to s_i_i(s_v_l()). If an error occured s_v_l returns NULL
+	and s_v_li() returns ERROR.
+MACRO: 
+	       there are macro versions which do no checks, they are called
+	S_V_L and S_V_LI
+
+COMMENT:
+To access the parts of the VECTOR object, there is the routine s_v_i(),
+and the routine s_v_ii(), which gives you the INTvalue, of the
+i-th object of the VECTOR object, which must be an INTEGER object.
+
+NAME:
+         s_v_i
+SYNOPSIS: 
+    OP s_v_i(OP vectorobject; INT index)
+DESCRIPTION:
+  selects the ith entry of an VECTOR object. There is first a 
+	check whether it is really an VECTOR object. Then there is a check
+	whether index is a value inside the length.
+	As the VECTOR object is indexed by INT-numbers there is a 
+	(theoretical) limit on the size of a VECTOR object, namely
+	there a maximal 2^31 elements.
+RETURN:	      
+	s_v_i gives the ith  entry of the VECTOR object. In the case
+	of an error it returns NULL. 
+MACRO: 
+       there is a macro version which does no checks, it 
+	is called
+	S_V_I 
+
+
+NAME:
+         s_v_ii
+SYNOPSIS: 
+    INT s_v_ii(OP vectorobject; INT index)
+DESCRIPTION:
+  selects the INT value of the
+	ith entry of an VECTOR object. There is first a 
+	check whether it is really an VECTOR object. Then there is a check
+	whether index is a value inside the length. And a last check
+	wether the ith- is a INTEGER object.
+	As the VECTOR object is indexed by INT-numbers there is a 
+	(theoretical) limit on the size of a VECTOR object, namely
+	there a maximal 2^31 elements.
+RETURN:	      
+	s_v_ii gives the INT value of the
+	ith  entry of the VECTOR object. 
+MACRO: 
+       there is a macro version which does no checks, it is called
+	S_V_II
+
+
+NAME:
+         init_vector
+SYNOPSIS:   
+  INT init_vector(OP a)
+DESCRIPTION:
+	this is the subroutine  of the global routine init, which is called
+	if
+  you can call the general routine init()
+        described in rest.doc with the OBJECTKIND VECTOR as
+        first parameter, after that the object a will be an 
+        VECTOR object with length 0 and the self part is equal 
+        to NULL.
+
+COMMENT:
+Very often it happens, that you want to initialize the VECTOR
+object with zeros.
+
+NAME: 
+	        m_il_nv
+SYNOPSIS:     
+	INT m_il_nv(INT il, OP v)
+DESCRIPTION:  
+	like the routines m_il_v but the elements
+        in the VECTOR object v are INTEGER objects with value 0.
+
+EXAMPLE:
+	.
+	.
+	a = callocobject();
+	m_il_nv(2L,a);
+	if (nullp(S_V_I(a,1L)))
+		printf("the second entry is zero\n");
+	freeall(a);
+        .
+	.
+	will produce the line
+			the second entry is zero
+	on the terminal.
+
+
+NAME: 
+              m_l_nv 
+SYNOPSIS:     
+              INT m_l_nv(OP l, OP v)
+DESCRIPTION:  
+	like the routine  m_l_v  but the elements
+        in the VECTOR object v are INTEGER objects with value 0.
+
+NAME: 
+              b_l_nv 
+SYNOPSIS:     
+              INT b_l_nv(OP l, OP v)
+DESCRIPTION:  
+	like the routine  b_l_v  but the elements
+        in the VECTOR object v are INTEGER objects with value 0.
+
+
+
+
+
+
+
+
+NAME:		
+	comp_numeric_vector
+SYNOPSIS:	
+	INT comp_numeric_vector(OP a,b);
+DESCRIPTION:	
+	a special routine for the comparision of two VECTOR
+	objects with INTEGER entries. If the length of the VECTOR
+	objects a and b differs, the smaller is filled temporarily
+	with zero entries and the routine does a lexicographic
+	comparision.
+RETURN:		
+	0 if equal, -1 if a is smaller, 1 if a is bigger
+
+NAME:		
+	comp_colex_vector
+SYNOPSIS:	
+	INT comp_colex_vector(OP a,b)
+DESCRIPTION:	
+	comparison by reading the VECTOR objects from the end
+
+
+
+NAME:         
+	add_apply_vector
+SYNOPSIS:     
+	INT add_apply_vector(OP a,b)
+DESCRIPTION:  
+	a,b should be two VECTOR objects, and the routine
+        computes b = b+a, where the addition of the two vectors is
+        componentwise. This also works, if the VECTOR objects have
+        different length. a,b must be different objects.
+	This is a subroutine of the general routine add_apply
+RETURN:
+       OK, or ERROR if some error occures.
+BUG:
+          there is no check on typs, because this is a special 
+        routine, normally you should use add_apply instead.
+
+
+NAME:         
+	add_vector
+SYNOPSIS:
+	     INT add_vector(OP a,b,c)
+DESCRIPTION:
+	  a,b should be VECTOR objects, c should be a empty object.
+        The routine computes c = a+b. The addition is componentwise,
+        and it also works if the vectors have different length.
+	a,b,c must all be different
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use add instead.
+
+
+
+NAME:  
+	       addinvers_apply_vector
+SYNOPSIS:
+	     INT addinvers_apply_vector(OP a)
+DESCRIPTION:
+	  a should be a VECTOR object. The routine computes
+        a = -a. This is also meant componentwise.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use addinvers_apply instead.
+
+
+
+NAME:  
+	       addinvers_vector
+SYNOPSIS:
+	     INT addinvers_vector(OP a,b)
+DESCRIPTION:
+	  a should be a VECTOR object. b should be a empty
+        object. The routine computes b = -a. This is meant componentwise.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use addinvers instead.
+
+
+NAME:  
+	       addtoallvectorelements
+SYNOPSIS:
+	     INT addtoallvectorelements(OP a,b,c)
+DESCRIPTION:
+	  b should be a vector, the routine adds a to all the 
+        elements of b, the result will become c.
+RETURN:
+	OK or ERROR
+BUG:   
+	       it only works for different a,b,c
+
+
+NAME:	     
+	 einsp_vector
+SYNOPSIS:
+	     INT einsp_vector(OP a)
+DESCRIPTION:
+	  return TRUE if all entries of the VECTOR object are
+	unity. Else the return value is FALSE
+BUG:
+		      this is a special routine, you should better use the
+	general routine einsp.
+
+NAME:  
+	       mult_scalar_vector
+SYNOPSIS:
+	     INT mult_scalar_vector(OP a,b,c)
+DESCRIPTION:
+	  b should be a VECTOR object, c should be an empty object.
+        The routine multiplies each element of b by a, and the result
+        is c.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use mult instead.
+
+
+
+NAME:  
+	       mult_apply_vector_vector
+SYNOPSIS:
+	     INT mult_apply_vector_vector(OP a,b)
+DESCRIPTION:
+	  a,b should be VECTOR objects,
+        The routine multiplies componentwise, and the result
+        is b. The vectors must be of the same length.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use mult_apply instead.
+
+
+NAME:  
+	       mult_vector_matrix
+SYNOPSIS:
+	     INT mult_vector_matrix(OP a,b,c)
+DESCRIPTION:
+	  a should be a VECTOR object, b should be a 
+	MATRIX object, c should be an empty object.
+        The routine multiplies according to the rules for the
+	mutiplication of matrices, and the result becomes
+        a VECTOR object. The length of the VECTOR object a must be 
+	equal to the height of the MATRIX object b.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use mult instead.
+
+NAME:  
+	       mult_vector_vector
+SYNOPSIS:
+	     INT mult_vector_vector(OP a,b,c)
+DESCRIPTION:
+	  a,b should be VECTOR objects, c should be an empty object.
+        The routine multiplies componentwise, and the result
+        is c. The vectors must be of the same length.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use mult instead.
+
+
+NAME:
+		      nullp_vector
+SYNOPSIS:
+	     INT nullp_vector(OP a)
+DESCRIPTION:
+	  return TRUE if all entries of the VECTOR object are
+	zero. Else the return value is FALSE
+BUG:
+		      this is a special routine, you should better use the
+	general routine nullp.
+
+NAME:  
+	       scalarproduct_vector
+SYNOPSIS:
+	     INT scalarproduct_vector(OP a,b,c)
+DESCRIPTION:
+	  a,b should be VECTOR objects, c should be the empty
+        object. a and b must have the same length. c becomes the
+        euclidian scalarproduct of a and b.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use scalarproduct instead.
+
+
+NAME:  
+	       sum_vector
+SYNOPSIS:
+	     INT sum_vector(OP a,b)
+DESCRIPTION:
+	  a should be a VECTOR object, b should be the empty
+        object. b becomes the sum over the vector a.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use sum instead.
+
+
+
+
+
+NAME:
+	         append_vector
+SYNOPSIS:
+	     INT append_vector(OP a,b,c)
+DESCRIPTION:
+	  a,b should be VECTOR objects, c the empty object.
+        The routine bulids an new VECTOR object c, where the
+        first part is a copy of a and the second part a copy of
+        b. All three parameter must be different.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use append instead.
+
+NAME:  
+	       comp_vector
+SYNOPSIS:
+	     INT comp_vector(OP a,b)
+DESCRIPTION:
+	  a,b should be VECTOR objects, the routine does
+        lexikographic comparision.
+RETURN:
+	       0 = equal <0  if a <b  >0 if a>b
+BUG:   
+	       there is no check on typs, because this is a special 
+        routine, normally you should use comp instead.
+
+NAME:  
+	       copy_vector
+SYNOPSIS:
+	     INT copy_vector(OP a,b)
+DESCRIPTION:
+	  a should be a VECTOR object, b the empty object.
+        b becomes a copy of a. a and b must be different. This
+	routine is called by other copy routines,
+	which copy objects with VECTOR type components.
+RETURN:
+	       OK, or ERROR
+BUG:   
+	       there is no check on typs, and there is no check
+	whether a nd b are different. Because this is a special 
+        routine, normaly you should use copy instead.
+
+NAME:
+			find_vector
+SYNOPSIS:
+		OP find_vector(OP a,b)
+	returns NULL if there is no object in the VECTOR object b,
+	which is equal to the object a. If such a object exists,
+	the result is the object in the vector, not a copy of
+	it, so you should not remove the result of this routine.
+
+NAME:
+			index_vector
+SYNOPSIS:
+		INT index_vector(OP a,b)
+	returns -1L if there is no object in the VECTOR object b,
+	which is equal to the object a. If such a object exists,
+	the result is the index in the vector. So the result is
+	always smaller then the length of the VECTOR object b.
+
+
+
+
+
+COMMENT:
+
+	INTEGERVECTOR
+	 
+	this is a special type of VECTOR object, where we now for
+	sure, that all the parts are INTEGER objects, so all the
+	routines for VECTOR objects can be applied, but the general 
+	routines like add etc., can call special functions which may be
+	faster.
+
+	BITVECTOR
+
+	this is a type which is simliar to VECTOR objects, but not
+	compatibel.

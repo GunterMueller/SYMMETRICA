@@ -1,0 +1,14 @@
+COMMENT:
+	BINTREE
+	-------
+
+	This is a object which implements a tree structure, which is 
+	used for high speed insertion of results into s sorted structure.
+
+NAME:		
+	t_BINTREE_LIST
+SYNOPSIS:	
+	INT t_BINTREE_LIST(OP a,b)
+DESCRIPTION:	
+	you have a BINTREE object a, which will be transformed
+	into a equivalent LIST object b. a and b may be equal.

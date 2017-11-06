@@ -1,0 +1,513 @@
+COMMENT:
+	The CLASSICAL.C module deals with the calculation of the dimensions,
+	standard tableaux and characters of the irreducible representations
+	of the classical groups.
+
+	This file first gives a very brief description of the labelling scheme
+	for representations of classical groups in terms of partitions.
+	It then describes the SYMMETRICA routines which calculate the
+	dimensions, standard tableaux and characters of all irreducible
+	representations of the classical groups. Finally, it describes
+	three example programs which make use of these routines.
+
+	In all cases, the set of irreducible representations of the classical
+	groups may be naturally indexed by a subset of the set of partitions,
+	half partitions (for the spin representations of O(n)) or signed
+	partitions (for some O(n) representations). This labelling scheme
+	is described in [BKW83], [Wy92], [We92].
+
+	In [We92] (see chapter 2), the specification of the irreducibles
+	is slightly different to the others for certain modules of O(n).
+	Namely, in [BKW83] and [Wy92], an asterisk is used to distinguish 
+	representations of O(n) which are associate (differ by a factor
+	of the determinant of the group element) whereas in [We92], 
+	associate representations are labelled by different partitions.
+	This latter notation is adhered to in these routines.
+	The only case where a partition alone does not serve to uniquely
+	identify the representation is for SO(2r) ordinary representations
+	where the partition has exactly r non-zero parts, and for all spin
+	representations of SO(2r). In such cases, there are two inequivalent
+	representations corresponding to the partition in question. These
+	two representations are usually distinguished by augmenting the
+	partition label with + or -. These two representations have the same
+	dimension and so are not distinguished in the dimension calculating
+	routines.
+
+	The representation labels are summarised here where the (descending)
+	partition p=(p(1),p(2),...,p(s)) has s non-zero parts and its conjugate
+	is p'=(p'(1),p'(2),...):
+
+	 Ordinary representations
+	 GL(n)    |  p : s<=n
+	 Sp(2r)   |  p : s<=r
+	 Sp(2r+1) |  p : s<=r+1
+	 O(n)     |  p : p'(1)+p'(2)<=n
+	 SO(2r+1) |  p : s<=r
+	 SO(2r)   |  p : s<r
+		  |  p+ : s=r
+		  |  p- : s=r
+
+	 Spin representations
+	 O(2r+1)  |  p : s<=r
+	 O(2r)    |  p : s<=r
+	 SO(2r+1) |  p : s<=r 
+	 SO(2r)   |  p+ : s<=r
+		  |  p- : s<=r
+
+	(Although Sp(2r+1) is not defined, remarkably the formulae for Sp(n)
+	work whether n is even or odd!)
+	In some labelling schemes, the spin representations are distinguished
+	from the ordinary representations either by appending a Delta to the
+	partition label, or by increasing each of the first [n/2] parts (zero
+	or not) by 1/2.
+
+	Each dimension calculation is based on a hook-length formula. For GL(n),
+	this was first described in [Ro58]. For Sp(2r), O(n) and the spin modules
+	of O(n), the formulae were first given in [EK79].
+
+	The standard tableaux for GL(n) are the well-known "semi-standard"
+	tableaux. For Sp(n), the tableaux were first given in [Ki76].
+	For the spin cases of O(n), they were first given in [KE83].
+	The easy transition to the spin cases of SO(n) is given in [We92].
+	The tableaux for the ordinary cases of O(n) and SO(n) were
+	first defined in [We92] and [KW93], but based on some tableaux 
+	by Proctor [Pr95]. In each case, the standard tableaux enumerate the
+	weights of the representation. Moreover, as then follows, the number
+	of standard tableaux is equal to the dimension of the corresponding
+	representation.
+	(In the case where the empty partition is given as an argument to
+	standard tableaux calculating routines, in the non-spin cases, 
+	for convenience, a single tableau of shape (1) and entry 0 is
+	returned. In the spin cases, each tensor component of the
+	tableau is also of this form. This should cause no difficulties.)
+
+	For each representation, the character is calculated by summing,
+	over all standard tableaux, a monomial (the weight) formed from each
+	tableau. The monomial is formed by multiplying together x_i for each
+	i appearing in the tableau. A negative entry contributes (x_i)^(-1).
+	An entry in a half box (for the spin representations) contributes
+	(x_i)^(1/2) or (x_i)^(-1/2). In the case of the spin representations,
+	the result obtained from the character routines has all the
+	exponents doubled so that integers suffice.
+
+	That this process of summing over standard tableaux actually gives the 
+	character is often clear from the original derivation of the standard
+	tableaux. Nonetheless, this and all the above is detailed in [We92].
+	(Incidentally, in [We92], the standard tableaux are used to provide a
+	very convenient basis for the irreducible modules themselves. By this
+	means, explicit matrix representations are readily calculated.)
+
+	Typically, each dimension, tableaux generation or character routine
+	requires, as arguments, three allocated SYMMETRICA objects. The first
+	is an INTEGER object giving the n in GL(n), Sp(n), O(n) or SO(n).
+	The second is a PARTITION object specifying the representation.
+	The last is an EMPTY object through which the result is returned.
+	(When it is necessary to distinguish between the + or - representation
+	in certain cases for SO(2r), an extra INTEGER argument is required.
+	Its value should be +1 or -1 to indicate either of the two cases.)
+	In the case of the dimension routines, this result becomes an INTEGER
+	or a LONGINT object containing the result. In the other routines, it
+	becomes a LIST object. For the character routines, each element in
+	the list is a POLYNOM object. For the ordinary tableaux generation
+	routines, each element in the list is a TABLEAUX. For spin tableaux,
+	each element is a MONOM, each component of which is a TABLEAUX,
+	thereby distinguishing the half-box and whole-box parts of the spinor
+	tableau.
+
+
+	[BKW83] G.R.E. Black, R.C. King and B.G. Wybourne,
+	  Kronecker Products for Compact Semisimple Lie Groups,
+	  J. Phys. A: Math. Gen. 16 (1983), 1555--1589.
+
+	[Wy92] B.G. Wybourne,
+	  Schur: an interactive programme for calculating properties of Lie groups
+	  (programme manual), (1992).
+
+	[We92] T.A. Welsh,
+	  PhD thesis, University of Southampton, (1992).
+
+	[Ro58] G. de B. Robinson,
+	  A Remark by Philip Hall,
+	  Can. Math. Bull. 1 (1958), 21--23.
+
+	[EK79] N. El-Samra and R.C. King,
+	  Dimensions of Irreducible Representations of the Classical Lie Groups,
+	  J. Phys. A: Math. Gen. 12 (1979), 2317--2328.
+
+	[Ki76] R.C. King, Weight Multiplicities for the Classical Groups, in
+	  Lecture notes in Physics 50 (1976), 490--499.
+
+	[KE83] R.C. King and N.G.I. El-Sharkaway,
+	  Standard Young Tableaux and Weight Multiplicities of the Classical
+	  Lie Groups,
+	  J. Phys. A16 (1983), 3153--3177.
+
+	[KW93] R.C. King and T.A. Welsh,
+	  Construction of Orthogonal Group Modules Using Tableaux,
+	  Lin. and Mult. Alg. 33 (1993), 251--283.
+
+	[Pr95] R.A. Proctor,
+	  Young Tableaux, Gelfand Patterns, and Branching Rules for
+	  Classical Lie Groups,
+	  J.Alg. 164 (1994), 299--360.
+
+	/*************************************************************************
+	 Here follow routines to calculate dimensions of classical groups 
+	*************************************************************************/
+
+
+NAME:          
+	gl_dimension
+SYNOPSIS:      
+	INT gl_dimension (OP n, OP partition, OP dim);
+DESCRIPTION:   
+	Calculates the dimension of the representation of GL(n)
+	       labelled by the partition. If the number of parts
+	       exceeds n, then an ERROR results. 
+	       Note that each irreducible representation of GL(n) is
+	       associate to one labelled by a partition with not more
+	       than n parts (and indeed to one with less than n parts).
+RETURN:        
+	OK or ERROR.
+
+
+NAME:          
+	sp_dimension
+SYNOPSIS:      
+	INT sp_dimension (OP n, OP partition, OP dim);
+DESCRIPTION:   
+	Calculates the dimension of the representation of Sp(n)
+	       labelled by the partition. If the number of parts
+	       exceeds n/2, then an ERROR results. If n is odd
+	       then a warning is given, but the calculation will
+	       proceed and return a value. 
+	       Each irreducible representation of Sp(2r) is labelled
+	       by a partition with not more than r parts.
+RETURN:
+	        OK or ERROR.
+
+
+NAME:  
+	        or_dimension
+SYNOPSIS:
+	      INT or_dimension (OP n, OP partition, OP dim);
+DESCRIPTION:
+	   Calculates the dimension of the representation of O(n)
+	       labelled by the partition. If the sum of the first
+	       two parts of the conjugate partition exceeds n,
+	       then an ERROR results.
+	       Each irreducible representation of O(n) is labelled by
+	       a partition for which the sum of the first two parts
+	       of the conjugate does not exceed n.
+RETURN:
+	        OK or ERROR.
+
+
+NAME:  
+	        so_dimension
+SYNOPSIS:
+	      INT so_dimension (OP n, OP partition, OP dim);
+DESCRIPTION:
+	   Calculates the dimension of the representation of SO(n)
+	       labelled by the partition. If the number of parts
+	       exceeds n/2, then an ERROR results.
+	       Each irreducible representation of SO(n) is labelled
+	       by a partition with not more than [n/2] parts, except
+	       that if n is even then two inequivalent irreducible
+	       representations correspond to each partition with
+	       exactly n/2 parts. (These two representations are
+	       usually distinguished by the use of + or - subscript
+	       on the partition label.) However, the two irreducible
+	       representations labelled by partitions with exactly 
+	       n/2 non-zero parts are of the same dimension and so
+	       for the current purposes, using the partition label is
+	       sufficient.
+RETURN:
+	        OK or ERROR.
+
+
+NAME:   
+	       pn_dimension
+SYNOPSIS:
+	      INT pn_dimension (OP n, OP partition, OP dim);
+DESCRIPTION:
+	   Calculates the dimension of the spin representation of 
+	       O(n) (the Pin(n) group) labelled by the partition.
+	       An ERROR results if the number of parts exceeds n/2.
+	       Each irreducible spin representation of O(n)
+	       is labelled by a partition for which the number of parts 
+	       does not exceed n. In fact, for n odd, there are
+	       further representations of Pin(n): the associates of
+	       those for which the number of parts does not exceed n/2.
+	       However as two-valued representations of O(n), the
+	       distinction is lost.
+RETURN:
+	        OK or ERROR.
+
+
+NAME:  
+	        sn_dimension
+SYNOPSIS:
+	      INT sn_dimension (OP n, OP partition, OP dim);
+DESCRIPTION:
+	   Calculates the dimension of the spin representation of 
+	       SO(n) (the Spin(n) group) labelled by the partition.
+	       If the number of parts exceeds n/2, then an ERROR results.
+	       For n odd, each irreducible spin representation of SO(n)
+	       is labelled by a partition with not more than [n/2] parts.
+	       For n even, each irreducible spin representation of SO(n)
+	       is one of two labelled by a partition with not more than
+	       n/2 parts. (These two representations are usually 
+	       distinguished by the use of + or - subscript on the
+	       partition label.) However, for n even, the two
+	       inequivalent irreducible representations labelled
+	       by a partition are of the same dimension and so for the
+	       current purposes, using the partition label is sufficient.
+RETURN:
+	        OK or ERROR.
+
+COMMENT:
+	/*************************************************************************
+	 Routines to calculate standard tableaux for the classical groups
+	*************************************************************************/
+
+
+NAME:   
+       gl_tableaux 
+SYNOPSIS:
+      INT gl_tableaux (OP n, OP partition, OP list);
+DESCRIPTION:
+   Calculates the set of standard tableaux ("semi-standard")
+	       for GL(n), returning a LIST of TABLEAUX in list.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        ERROR or number of standard tableaux.
+
+NAME: 
+         sp_tableaux 
+SYNOPSIS:
+      INT sp_tableaux (OP n, OP partition, OP list);
+DESCRIPTION:
+   Calculates the set of standard tableaux for Sp(n),
+	       returning a LIST of TABLEAUX in list.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        ERROR or number of standard tableaux.
+
+NAME:
+          or_tableaux 
+SYNOPSIS:
+      INT or_tableaux (OP n, OP partition, OP list);
+DESCRIPTION:
+   Calculates the set of standard tableaux for O(n),
+	       returning a LIST of TABLEAUX in list.
+	       ERROR returned if partition is not a valid label. 
+RETURN:
+        ERROR or number of standard tableaux.
+
+NAME:
+	          so_tableaux 
+SYNOPSIS:
+	      INT so_tableaux (OP n, OP partition, INT flag, OP list);
+DESCRIPTION:
+   Calculates the set of standard tableaux for SO(n),
+	       returning a LIST of TABLEAUX in list. flag is used
+	       only if n is even and partition has exactly n/2 parts.
+               For flag=+1 or -1, it chooses between the two
+	       representations labelled by the partition in this case.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        ERROR or number of standard tableaux.
+
+NAME:
+          pn_tableaux 
+SYNOPSIS:
+      INT pn_tableaux (OP n, OP partition, OP list);
+DESCRIPTION:
+   Calculates the set of standard spinor-tableaux for O(n),
+	       returning a LIST of MONOM in list. Each MONOM has
+	       a TABLEAUX as each component. The koeff TABLEAUX
+	       has one column and contains the entries from the
+	       half (spin) boxes, while the self TABLEAUX contains
+	       the entries from the whole (tensor) boxes.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        ERROR or number of standard tableaux.
+ 
+NAME:
+          sn_tableaux 
+SYNOPSIS:
+      INT sn_tableaux (OP n, OP partition, INT flag, OP list);
+DESCRIPTION:
+   Calculates the set of standard spinor-tableaux for SO(n),
+	       returning a LIST of MONOM in list. Each MONOM has
+	       a TABLEAUX as each component. The koeff TABLEAUX
+	       has one column and contains the entries from the
+	       half (spin) boxes, while the self TABLEAUX contains
+	       the entries from the whole (tensor) boxes. flag is
+	       used only if n is even. For flag=+1 or -1, it chooses
+	       between the two representations labelled by the
+	       partition in this case.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        ERROR or number of standard tableaux.
+ 
+COMMENT:
+	/*************************************************************************
+	 Routines to calculate characters for the classical groups
+	*************************************************************************/
+
+NAME:
+          gl_character
+SYNOPSIS:
+      INT gl_character (OP n, OP partition, OP character);
+DESCRIPTION:
+   Calculates the character of the representation of GL(n)
+	       labelled by partition. This is the Schur function.
+	       It is returned as a POLYNOM object in character.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        OK or ERROR.
+
+NAME:
+          sp_character
+SYNOPSIS:
+      INT sp_character (OP n, OP partition, OP character);
+DESCRIPTION:
+   Calculates the character of the representation of Sp(n)
+	       labelled by partition. It is returned as a POLYNOM
+	       object in character. ERROR returned if partition has
+	       tooo many parts.
+RETURN:
+        OK or ERROR.
+
+NAME:
+          or_character
+SYNOPSIS:
+      INT or_character (OP n, OP partition, OP character);
+DESCRIPTION:
+   Calculates the character of the representation of O(n)
+	       labelled by partition. It is returned as a POLYNOM
+	       object in character. ERROR returned if partition is
+	       not a valid representation label. 
+RETURN:
+        OK or ERROR.
+
+NAME:
+          so_character
+SYNOPSIS:
+      INT so_character (OP n, OP partition, INT flag, OP character);
+DESCRIPTION:
+   Calculates the character of the representation of SO(n)
+	       labelled by partition. It is returned as a POLYNOM
+	       object in character. flag is used only if n is even
+	       and partition has exactly n/2 parts. For flag=+1 or -1,
+	       it chooses between the two representations labelled by
+	       the partition in this case. ERROR returned if partition
+	       has tooo many parts.
+RETURN:
+        OK or ERROR.
+
+NAME:
+          pn_character
+SYNOPSIS:
+      INT pn_character (OP n, OP partition, OP character);
+DESCRIPTION:
+   Calculates the spin character of the representation of
+	       O(n) labelled by partition. It is returned as a
+	       POLYNOM object in character, where each exponent is
+	       double the actual exponent which is an half odd-integer.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        OK or ERROR.
+
+NAME:
+          sn_character
+SYNOPSIS:
+      INT sn_character (OP n, OP partition, INT flag, OP character);
+DESCRIPTION:
+   Calculates the spin character of the representation of
+	       SO(n) labelled by partition. It is returned as a
+	       POLYNOM object in character, where each exponent is
+	       double the actual exponent which is an half odd-integer.
+	       flag is used only if partition has exactly n/2 parts.
+	       For flag=+1 or -1, it chooses between the two
+	       representations labelled by the partition in this case.
+	       ERROR returned if partition has tooo many parts.
+RETURN:
+        OK or ERROR.
+COMMENT:
+
+	/*************************************************************************
+	 Here follows a list of prototypes for the routines described above.
+	*************************************************************************/
+
+	/*************************************************************************
+	 Routines to calculate dimensions of the classical groups
+	*************************************************************************/
+
+	INT gl_dimension (OP n, OP partition, OP dim);
+	INT sp_dimension (OP n, OP partition, OP dim);
+	INT or_dimension (OP n, OP partition, OP dim);
+	INT so_dimension (OP n, OP partition, OP dim);
+	INT pn_dimension (OP n, OP partition, OP dim);
+	INT sn_dimension (OP n, OP partition, OP dim);
+
+	/*************************************************************************
+	 Routines to calculate standard tableaux for the classical groups
+	*************************************************************************/
+
+	INT gl_tableaux (OP n, OP partition, OP list);
+	INT sp_tableaux (OP n, OP partition, OP list);
+	INT or_tableaux (OP n, OP partition, OP list);
+	INT so_tableaux (OP n, OP partition, INT flag, OP list);
+	INT pn_tableaux (OP n, OP partition, OP list);
+	INT sn_tableaux (OP n, OP partition, INT flag, OP list);
+
+	/*************************************************************************
+	 Routines to calculate characters for the classical groups
+	*************************************************************************/
+
+	INT gl_character (OP n, OP partition, OP character);
+	INT sp_character (OP n, OP partition, OP character);
+	INT or_character (OP n, OP partition, OP character);
+	INT so_character (OP n, OP partition, INT flag, OP character);
+	INT pn_character (OP n, OP partition, OP character);
+	INT sn_character (OP n, OP partition, INT flag, OP character);
+
+
+	/*************************************************************************
+	 Here follow brief descriptions of the example programs.
+	*************************************************************************/
+
+
+	The following program is written in the C language, using the
+	SYMMETRICA object oriented approach.
+
+	CLS_EX1.C
+	  This program first requests the user for a value of n and then for
+	a partition. These values are sent in turn to each of the dimension
+	calculating routines above (for some they may be invalid) to calculate
+	the dimension of the irreducible representation labelled by the
+	partition, for each case: GL(n), Sp(n), O(n), SO(n), spin O(n),
+	spin SO(n).  After each call, the result is displayed.
+
+	CLS_EX2.C
+	  This program first requests the user for a value of n and then for
+	a partition. The user is then asked for which classical group,
+	GL(n), Sp(n), O(n), SO(n), spin O(n), or spin SO(n), she wishes
+	to calculate the set of standard tableaux. If necessary the
+	+/- specification is also requested. The standard tableaux are
+	displayed together with their number.
+
+	CLS_EX3.C
+	  This program first requests the user for a value of n and then for
+	a partition. The user is then asked for which classical group,
+	GL(n), Sp(n), O(n), SO(n), spin O(n), or spin SO(n), she wishes to 
+	calculate the character. If necessary, the +/- specification is also
+	requested. The character is then displayed. 
+
+	/*************************************************************************
+				      Trevor Welsh, Bayreuth, April 1996.
+	*************************************************************************/
+
